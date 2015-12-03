@@ -8,7 +8,7 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created December  2, 2015 by William A. Perkins
-# Last Change: 2015-12-02 15:02:40 d3g096
+# Last Change: 2015-12-02 15:29:33 d3g096
 # -------------------------------------------------------------
 
 cmake_minimum_required (VERSION 2.8.8)
@@ -31,10 +31,11 @@ message(STATUS "MPI_CXX_LIBRARIES: ${MPI_CXX_LIBRARIES}")
 # -------------------------------------------------------------
 find_package(Trilinos 12.0 REQUIRED
   HINTS ${Trilinos_DIR}
+  COMPONENTS Teuchos Epetra EpetraExt Tpetra
 )
 
 if (Trilinos_FOUND)
-  message(STATUS "Found Trilinos: ${Trilinos_LIBRARY_DIR}")
+  message(STATUS "Found Trilinos: ${Trilinos_DIR}")
 endif (Trilinos_FOUND)
 
 include_directories(${Teuchos_INCLUDE_DIRS})

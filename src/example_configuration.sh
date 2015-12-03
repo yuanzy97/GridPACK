@@ -1,4 +1,16 @@
 #! /bin/sh
+# -------------------------------------------------------------
+# file: example_configuration.sh
+# -------------------------------------------------------------
+# -------------------------------------------------------------
+# Copyright (c) 2013 Battelle Memorial Institute
+# Licensed under modified BSD License. A copy of this license can be found
+# in the LICENSE file in the top level directory of this distribution.
+# -------------------------------------------------------------
+# -------------------------------------------------------------
+# Created December  2, 2015 by William A. Perkins
+# Last Change: 2015-12-02 12:04:52 d3g096
+# -------------------------------------------------------------
 
 host=`uname -n`
 
