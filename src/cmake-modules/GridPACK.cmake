@@ -6,12 +6,14 @@
 #
 # -------------------------------------------------------------
 # file: GridPACK.cmake
-#
+# macros specific to GridPACK configuration 
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created June 10, 2013 by William A. Perkins
-# Last Change: 2015-06-25 12:25:27 d3g096
+# Last Change: 2015-12-04 11:53:31 d3g096
 # -------------------------------------------------------------
+
+include(GridPACKMath)
 
 # This is used to specify a time out for GridPACK unit tests. It's 5
 # seconds by default, but may need to be longer on some platforms.

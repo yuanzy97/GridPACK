@@ -9,7 +9,7 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created December  2, 2015 by William A. Perkins
-# Last Change: 2015-12-02 12:04:52 d3g096
+# Last Change: 2015-12-04 11:51:43 d3g096
 # -------------------------------------------------------------
 
 host=`uname -n`
@@ -47,6 +47,7 @@ if [ $host == "flophouse" ]; then
         -D GA_DIR:STRING="$prefix/ga-5-4" \
         -D USE_PROGRESS_RANKS:BOOL=OFF \
         -D BOOST_ROOT:STRING="$prefix" \
+        -D GridPACK_MATH_LIBRARY:STRING="PETSC" \
         -D PETSC_DIR:STRING="/net/flophouse/files0/perksoft/petsc-3.6.0" \
         -D PETSC_ARCH:STRING='linux-gnu48-complex-opt' \
         -D MPI_CXX_COMPILER:STRING="$prefix/bin/mpicxx" \

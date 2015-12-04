@@ -10,7 +10,7 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created May  3, 2013 by William A. Perkins
-# Last Change: 2015-12-02 11:38:01 d3g096
+# Last Change: 2015-12-04 11:46:56 d3g096
 # -------------------------------------------------------------
 
 cmake_minimum_required (VERSION 2.6.4)
@@ -104,50 +104,12 @@ find_package(Boost 1.49 COMPONENTS mpi serialization random filesystem system RE
 include_directories(AFTER ${Boost_INCLUDE_DIRS})
 
 # -------------------------------------------------------------
-# PETSc
+# Find a math library
 #
-# We need a very recent version of PETSc. It needs to parallel and
-# compiled with C++ complex support.
+# Set GridPACK_MATH_LIBRARY to "PETSC", with PETSC_DIR and PETSC_ARCH
+# appropriately.
 # -------------------------------------------------------------
-message(STATUS "Checking PETSc ...")
-find_package (PETSc COMPONENTS CXX REQUIRED)
-
-if (EXISTS "${PETSC_DIR}/${PETSC_ARCH}/conf/PETScConfig.cmake")
-  include("${PETSC_DIR}/${PETSC_ARCH}/conf/PETScConfig.cmake")
-elseif (EXISTS "${PETSC_DIR}/${PETSC_ARCH}/lib/petsc/conf/PETScConfig.cmake")
-  include("${PETSC_DIR}/${PETSC_ARCH}/lib/petsc/conf/PETScConfig.cmake")
-else()
-  message(FATAL_ERROR "PETSc found, but CMake configuration for PETSc installation not found?")
-endif()
-
-
-# checks 
-
-if (NOT PETSC_HAVE_MPI)
-  message(FATAL_ERROR "PETSc installation is not parallel (--with-mpi=1)")
-endif()
-
-# PETSc can be compiled for double precsion (--with-precision=double)
-# complex (--with-scalar-type=complex) or real
-# (--with-scalar-type=real).  This is to determine what that
-# underlying type is.
-
-if (PETSC_USE_REAL_DOUBLE) 
-  message(STATUS "PETSc installation is double precision (--with-precision=double) -- good")
-else()
-  message(FATAL_ERROR "PETSc installation is not double precision (--with-precision=double)")
-endif()
-
-if (PETSC_USE_COMPLEX) 
-  message (STATUS "PETSc installation uses complex type (--with-scalar-type=complex)")
-else()
-  message (STATUS "PETSc installation uses real type (--with-scalar-type=real)")
-endif()
-
-# This is probably redundant
-if (NOT PETSC_CLANGUAGE_Cxx)
-  message (FATAL_ERROR "PETSc installation does not use C++ (--with-clanguage=c++)")
-endif()
+gridpack_check_math()
 
 # -------------------------------------------------------------
 # ParMETIS
