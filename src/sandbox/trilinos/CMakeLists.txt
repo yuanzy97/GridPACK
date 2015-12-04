@@ -8,7 +8,7 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created December  2, 2015 by William A. Perkins
-# Last Change: 2015-12-03 14:02:48 d3g096
+# Last Change: 2015-12-03 15:11:38 d3g096
 # -------------------------------------------------------------
 
 cmake_minimum_required (VERSION 2.8.8)
@@ -52,6 +52,16 @@ set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${Trilinos_C_COMPILER_FLAGS}")
 # -------------------------------------------------------------
 add_executable(hello hello.cpp)
 target_link_libraries(hello 
+  ${Trilinos_LIBRARIES} 
+  ${MPI_CXX_LIBRARIES}
+)
+
+# -------------------------------------------------------------
+# epetra_simple 
+# From the Trilinos Epetra examples
+# -------------------------------------------------------------
+add_executable(epetra_simple epetra_simple.cpp)
+target_link_libraries(epetra_simple
   ${Trilinos_LIBRARIES} 
   ${MPI_CXX_LIBRARIES}
 )
