@@ -9,7 +9,7 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created December  2, 2015 by William A. Perkins
-# Last Change: 2015-12-04 11:51:43 d3g096
+# Last Change: 2015-12-04 13:57:36 d3g096
 # -------------------------------------------------------------
 
 
@@ -18,13 +18,14 @@
 # -------------------------------------------------------------
 usage="$0 [-d|-r] [name]"
 
-set -- `getopt d $*`
+set -- `getopt drt $*`
 if [ $? != 0 ]; then
     echo $usage >&2
     exit 2
 fi
 
 build="RelWithDebInfo"
+trace="no"
 for o in $*; do
     case $o in
         -d)
@@ -33,6 +34,10 @@ for o in $*; do
             ;;
         -r)
             build="Release"
+            shift
+            ;;
+        -t) 
+            trace="yes"
             shift
             ;;
         --)
@@ -55,6 +60,10 @@ fi
 rm -rf CMakeCache.txt CMakeFiles
 
 options="-Wdev --debug-trycompile"
+
+if [ "$trace"x = "yes"x ]; then
+    options="$options --trace"
+fi
 
 # useful build types: Debug, Release, RelWithDebInfo
 common_flags="\
@@ -81,7 +90,7 @@ if [ $host == "flophouse" ]; then
 
     cplexroot="/opt/ibm/ILOG/CPLEX_Studio1261"
 
-    cmake -Wdev --debug-trycompile \
+    cmake $options \
         -D GA_DIR:STRING="$prefix/ga-5-4" \
         -D USE_PROGRESS_RANKS:BOOL=OFF \
         -D BOOST_ROOT:STRING="$prefix" \
@@ -92,6 +101,41 @@ if [ $host == "flophouse" ]; then
         -D MPI_C_COMPILER:STRING="$prefix/bin/mpicc" \
         -D MPIEXEC:STRING="$prefix/bin/mpiexec" \
         -D USE_CPLEX:BOOL=ON \
+        -D CPLEX_ROOT_DIR:PATH="$cplexroot" \
+        -D MPIEXEC_MAX_NUMPROCS:STRING="4" \
+        -D GRIDPACK_TEST_TIMEOUT:STRING=10 \
+        -D CMAKE_INSTALL_PREFIX:PATH="$prefix/gridpack" \
+        $common_flags ..
+
+elif [ $host == "flophousetri" ]; then
+
+    # RHEL 5 with GNU 4.8 compilers built from scratch
+
+    prefix="/net/flophouse/files0/perksoft/linux64/openmpi48"
+    PATH="${prefix}/bin:${PATH}"
+    export PATH
+
+    CC="$prefix/bin/gcc"
+    export CC
+    CXX="$prefix/bin/g++"
+    export CXX
+    CFLAGS="-pthread -Wall"
+    export CFLAGS
+    CXXFLAGS="-pthread -Wall"
+    export CXXFLAGS
+
+    cplexroot="/opt/ibm/ILOG/CPLEX_Studio1261"
+
+    cmake -Wdev --debug-trycompile \
+        -D GA_DIR:STRING="$prefix/ga-5-4" \
+        -D USE_PROGRESS_RANKS:BOOL=OFF \
+        -D BOOST_ROOT:STRING="$prefix" \
+        -D GridPACK_MATH_LIBRARY:STRING="Trilinos" \
+        -D Trilinos_DIR:STRING="$prefix/trilinos" \
+        -D MPI_CXX_COMPILER:STRING="$prefix/bin/mpicxx" \
+        -D MPI_C_COMPILER:STRING="$prefix/bin/mpicc" \
+        -D MPIEXEC:STRING="$prefix/bin/mpiexec" \
+        -D USE_CPLEX:BOOL=OFF \
         -D CPLEX_ROOT_DIR:PATH="$cplexroot" \
         -D MPIEXEC_MAX_NUMPROCS:STRING="4" \
         -D GRIDPACK_TEST_TIMEOUT:STRING=10 \

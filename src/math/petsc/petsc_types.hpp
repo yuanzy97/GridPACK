@@ -8,7 +8,7 @@
 // -------------------------------------------------------------
 // -------------------------------------------------------------
 // Created February 18, 2015 by William A. Perkins
-// Last Change: 2015-02-18 08:03:29 d3g096
+// Last Change: 2015-12-07 10:07:35 d3g096
 // -------------------------------------------------------------
 
 
@@ -17,9 +17,7 @@
 
 
 #include <petsc.h>
-#include <boost/mpl/if.hpp>
-#include <boost/type_traits/is_same.hpp>
-#include <gridpack/utilities/complex.hpp>
+#include "library_types.hpp"
 
 namespace gridpack {
 namespace math {
@@ -31,22 +29,20 @@ namespace math {
  * is complex.  This type computes and stores that flag. 
  * 
  */
-template <typename T>
-struct UsePetscLibrary
-  : public boost::mpl::bool_<
-            boost::is_same<T, PetscScalar>::value ||
-            boost::is_same<ComplexType, PetscScalar>::value >::type
+template <typename GridPACKScalar>
+struct UsePetscLibrary : public UseLibrary<GridPACKScalar, PetscScalar>
 {
 };
 
-/// The number of library elements used to represent a single vector element
-template <typename T>
+/// The number of PETSc scalars used to represent a single GridPACK vector element
+template <typename GridPACKScalar>
 struct PetscElementSize
-  : public boost::mpl::if_< UsePetscLibrary<T>, 
+  : public boost::mpl::if_< UseLibrary<GridPACKScalar, PetscScalar>, 
                             boost::mpl::int_<1>, 
                             boost::mpl::int_<2> >::type
 {
 };
+
 
 
 } // namespace math

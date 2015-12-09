@@ -9,7 +9,7 @@
 /**
  * @file   small_matrix_solve.cpp
  * @author William A. Perkins
- * @date   2014-01-31 11:39:25 d3g096
+ * @date   2015-12-07 10:15:42 d3g096
  * 
  * @brief  
  * 
@@ -50,8 +50,8 @@ main(int argc, char **argv)
 
   boost::scoped_ptr<gridpack::math::Matrix> 
     A(new gridpack::math::Matrix(self, 9, 9)),
-    B(new gridpack::math::Matrix(self, 9, 3, gridpack::math::Matrix::Dense)),
-    Xorig(new gridpack::math::Matrix(self, 9, 3, gridpack::math::Matrix::Dense));
+    B(new gridpack::math::Matrix(self, 9, 3, gridpack::math::Dense)),
+    Xorig(new gridpack::math::Matrix(self, 9, 3, gridpack::math::Dense));
 
   A->setElement(0, 0, gridpack::ComplexType(0, -33.8085));
   A->setElement(0, 3, gridpack::ComplexType(0,  17.3611));

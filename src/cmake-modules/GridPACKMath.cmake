@@ -10,7 +10,7 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created December  4, 2015 by William A. Perkins
-# Last Change: 2015-12-04 11:46:42 d3g096
+# Last Change: 2015-12-09 08:02:03 d3g096
 # -------------------------------------------------------------
 
 # -------------------------------------------------------------
@@ -62,7 +62,36 @@ function(gridpack_check_petsc)
     message (FATAL_ERROR "PETSc installation does not use C++ (--with-clanguage=c++)")
   endif()
 
+  set(GridPACK_MATH_PETSC ${ispetsc} CACHE INTERNAL "GridPACK uses PETSc for math" FORCE)
+  set(GridPACK_MATH_C_FLAGS "${PETSC_DEFINES}" PARENT_SCOPE)
+  set(GridPACK_MATH_CXX_FLAGS "${PETSC_DEFINES}" PARENT_SCOPE)
+  set(GridPACK_MATH_INCLUDE_DIRS  ${PETSC_INCLUDES} PARENT_SCOPE)
+  set(GridPACK_MATH_LIBRARIES ${PETSC_LIBRARIES} PARENT_SCOPE)
 endfunction(gridpack_check_petsc)
+
+# -------------------------------------------------------------
+# gridpack_check_trilinos
+#
+# Select Trilinos as the undelying math library for GridPACK.  This
+# relies exclusively on the Trilinos find_package macro.
+# -------------------------------------------------------------
+function(gridpack_check_trilinos)
+  find_package(Trilinos 12.0 REQUIRED
+    HINTS ${Trilinos_DIR}
+    COMPONENTS Teuchos Epetra EpetraExt 
+    )
+  if (Trilinos_FOUND)
+    message(STATUS "Found Trilinos ${Trilinos_VERSION}")
+    message(STATUS "${Trilinos_INCLUDE_DIRS}")
+    message(STATUS "${Trilinos_TPL_INCLUDE_DIRS}")
+    set(GridPACK_MATH_Trilinos ${Trilinos_FOUND} CACHE INTERNAL "GridPACK uses Trilinos for math")
+    set(GridPACK_MATH_C_FLAGS "${Trilinos_C_COMPILER_FLAGS}" PARENT_SCOPE)
+    set(GridPACK_MATH_CXX_FLAGS "${Trilinos_CXX_COMPILER_FLAGS}" PARENT_SCOPE)
+    set(GridPACK_MATH_INCLUDE_DIRS ${Trilinos_INCLUDE_DIRS} ${Trilinos_TPL_INCLUDE_DIRS} PARENT_SCOPE)
+    set(GridPACK_MATH_LIBRARIES ${Trilinos_LIBRARIES} ${Trilinos_TPL_LIBRARIES} PARENT_SCOPE)
+    message(STATUS "${GridPACK_MATH_INCLUDE_DIRS}")
+  endif (Trilinos_FOUND)
+endfunction(gridpack_check_trilinos)
 
 # -------------------------------------------------------------
 # gridpack_check_math
@@ -73,10 +102,19 @@ function(gridpack_check_math)
   else()
     string(TOUPPER ${GridPACK_MATH_LIBRARY} GridPACK_MATH_LIBRARY)
   endif()
+
   string(COMPARE EQUAL "${GridPACK_MATH_LIBRARY}" "PETSC" ispetsc)
+  string(COMPARE EQUAL "${GridPACK_MATH_LIBRARY}" "TRILINOS" istrilinos)
+
   if (ispetsc)
     gridpack_check_petsc()
+  elseif(istrilinos)
+    gridpack_check_trilinos()
   else()
     message(FATAL_ERROR "Unknown math library name: ${GridPACK_MATH_LIBRARY}")
   endif()
+  set(GridPACK_MATH_C_FLAGS "${GridPACK_MATH_C_FLAGS}" CACHE STRING "C compiler flags required by math libary")
+  set(GridPACK_MATH_CXX_FLAGS "${GridPACK_MATH_CXX_FLAGS}" CACHE STRING "C++ compiler flags required by math libary")
+  set(GridPACK_MATH_INCLUDE_DIRS  ${GridPACK_MATH_INCLUDE_DIRS} CACHE STRING "Include directories for math library")
+  set(GridPACK_MATH_LIBRARIES ${GridPACK_MATH_LIBRARIES} CACHE STRING "Math libraries")
 endfunction(gridpack_check_math)

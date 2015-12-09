@@ -10,7 +10,7 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created May  3, 2013 by William A. Perkins
-# Last Change: 2015-12-04 11:46:56 d3g096
+# Last Change: 2015-12-04 13:43:44 d3g096
 # -------------------------------------------------------------
 
 cmake_minimum_required (VERSION 2.6.4)
@@ -213,7 +213,7 @@ endif()
 add_subdirectory(utilities)
 add_subdirectory(parallel)
 add_subdirectory(configuration)
-# add_subdirectory(math)
+add_subdirectory(math)
 # add_subdirectory(component)
 # add_subdirectory(partition)
 # add_subdirectory(network)
