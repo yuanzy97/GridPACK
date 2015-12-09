@@ -3,7 +3,7 @@
 /**
  * @file   trilinos_types.hpp
  * @author William A. Perkins
- * @date   2015-12-07 10:25:37 d3g096
+ * @date   2015-12-09 10:15:04 d3g096
  * 
  * @brief  
  * 
@@ -22,6 +22,10 @@
 
 #ifndef _trilinos_types_hpp_
 #define _trilinos_types_hpp_
+
+namespace gridpack {
+namespace math {
+
 
 /// The Trilinos scalar type
 /**
@@ -56,5 +60,8 @@ template <typename GridPACKScalar>
 struct TrilinosElementSize: public ElementSize<GridPACKScalar, TrilinosScalar>
 {
 };
+
+} // namespace math
+} // namespace gridpack
 
 #endif

@@ -9,7 +9,7 @@
 /**
  * @file   implementation_visitor.hpp
  * @author William A. Perkins
- * @date   2015-03-05 12:51:12 d3g096
+ * @date   2015-12-09 10:08:57 d3g096
  * 
  * @brief  
  * 
@@ -32,6 +32,7 @@ namespace math {
 
 class PetscVectorWrapper;
 class PetscMatrixWrapper;
+class EpetraVectorWrapper;
 
 // -------------------------------------------------------------
 //  class ImplementationVisitor
@@ -57,6 +58,7 @@ public:
   /// The default visit (should just assert or do nothing)
   virtual void visit(PetscVectorWrapper&);
   virtual void visit(PetscMatrixWrapper&);
+  virtual void visit(EpetraVectorWrapper&);
 };
 
 // -------------------------------------------------------------
@@ -82,6 +84,7 @@ public:
   /// The default visit, const version (should just assert or do nothing)
   virtual void visit(const PetscVectorWrapper&);
   virtual void visit(const PetscMatrixWrapper&);
+  virtual void visit(const EpetraVectorWrapper&);
 };
 
 } // namespace math

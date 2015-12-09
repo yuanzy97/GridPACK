@@ -7,7 +7,7 @@
 # distribution.
 # -------------------------------------------------------------
 # Created May  7, 2013 by William A. Perkins
-# Last Change: 2015-12-07 11:47:08 d3g096
+# Last Change: 2015-12-09 10:07:56 d3g096
 # -------------------------------------------------------------
 set(gridpack_math_sources)
 set(target_libraries 
@@ -119,6 +119,7 @@ elseif(GridPACK_MATH_Trilinos)
 
   list(APPEND gridpack_math_sources 
     trilinos/trilinos_math.cpp
+    trilinos/epetra_vector_wrap.cpp
     )
 
 else()

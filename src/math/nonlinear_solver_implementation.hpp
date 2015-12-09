@@ -9,7 +9,7 @@
 /**
  * @file   nonlinear_solver_implementation.hpp
  * @author William A. Perkins
- * @date   2015-03-26 14:27:58 d3g096
+ * @date   2015-12-09 09:19:44 d3g096
  * 
  * @brief  
  * 
@@ -27,6 +27,7 @@
 #include <gridpack/math/nonlinear_solver_interface.hpp>
 #include <gridpack/parallel/distributed.hpp>
 #include <gridpack/utilities/uncopyable.hpp>
+#include <gridpack/utilities/null_deleter.hpp>
 #include <gridpack/configuration/configurable.hpp>
 
 namespace gridpack {
@@ -49,12 +50,6 @@ public:
   typedef typename NLSBuilder<T, I>::Jacobian JacobianBuilder;
   typedef typename NLSBuilder<T, I>::Function FunctionBuilder;
 
-  /// A functor to keep smart pointers from deleting their pointer
-  struct null_deleter
-  {
-    void operator()(void const *) const { }
-  };
-
   /// Default constructor.
   NonlinearSolverImplementation(const parallel::Communicator& comm,
                                 const int& local_size,
@@ -65,7 +60,7 @@ public:
       utility::Configurable("NonlinearSolver"), 
       utility::Uncopyable(),
       p_J(), p_F(), 
-      p_X((VectorType *)NULL, null_deleter()),  // pointer set by solve()
+      p_X((VectorType *)NULL, utility::null_deleter()),  // pointer set by solve()
       p_jacobian(form_jacobian), 
       p_function(form_function),
       p_solutionTolerance(1.0e-05),
@@ -88,8 +83,8 @@ public:
       parallel::Distributed(J.communicator()), 
       utility::Configurable("NonlinearSolver"), 
       utility::Uncopyable(),
-      p_J(&J, null_deleter()), p_F(), 
-      p_X((VectorType *)NULL, null_deleter()),  // pointer set by solve()
+      p_J(&J, utility::null_deleter()), p_F(), 
+      p_X((VectorType *)NULL, utility::null_deleter()),  // pointer set by solve()
       p_jacobian(form_jacobian), 
       p_function(form_function),
       p_solutionTolerance(1.0e-05),
@@ -161,7 +156,7 @@ protected:
   void p_solve(VectorType& x)
   {
     // children should call this is their own p_solve()
-    p_X.reset(&x, null_deleter());
+    p_X.reset(&x, utility::null_deleter());
   }
 
   /// Specialized way to configure from property tree

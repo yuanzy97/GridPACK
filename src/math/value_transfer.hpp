@@ -10,7 +10,7 @@
 /**
  * @file   value_transfer.hpp
  * @author William A. Perkins
- * @date   2015-05-07 11:09:35 d3g096
+ * @date   2015-12-09 09:18:31 d3g096
  * 
  * @brief  
  * 
@@ -32,6 +32,7 @@
 #include "numeric_type_check.hpp"
 
 #include "gridpack/utilities/uncopyable.hpp"
+#include "gridpack/utilities/null_deleter.hpp"
 
 namespace gridpack {
 namespace math {
@@ -60,7 +61,7 @@ public:
       p_to()
   {
     if (to != NULL) {
-      p_to.reset(to, null_deleter());
+      p_to.reset(to, utility::null_deleter());
     }
   }
 
@@ -118,12 +119,6 @@ private:
   BOOST_STATIC_ASSERT(TypeCheck<FromType>::OK::value);
   BOOST_STATIC_ASSERT(TypeCheck<ToType>::OK::value);
 
-  /// A thing to provide a null delete operation
-  struct null_deleter {
-    void operator()(void const *p) const {}
-  };
-  
-  
 };
 
 
@@ -169,7 +164,7 @@ inline void
 ValueTransfer<RealType, RealType>::p_setup()
 {
   if (!p_to) {
-    p_to.reset(p_from, null_deleter());
+    p_to.reset(p_from, utility::null_deleter());
   }
 };
 
@@ -178,7 +173,7 @@ inline void
 ValueTransfer<ComplexType, ComplexType>::p_setup()
 {
   if (!p_to) {
-    p_to.reset(p_from, null_deleter());
+    p_to.reset(p_from, utility::null_deleter());
   }
 };
 
