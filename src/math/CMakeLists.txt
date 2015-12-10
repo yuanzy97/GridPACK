@@ -7,7 +7,7 @@
 # distribution.
 # -------------------------------------------------------------
 # Created May  7, 2013 by William A. Perkins
-# Last Change: 2015-12-09 10:07:56 d3g096
+# Last Change: 2015-12-10 12:05:41 d3g096
 # -------------------------------------------------------------
 set(gridpack_math_sources)
 set(target_libraries 
@@ -120,6 +120,7 @@ elseif(GridPACK_MATH_Trilinos)
   list(APPEND gridpack_math_sources 
     trilinos/trilinos_math.cpp
     trilinos/epetra_vector_wrap.cpp
+    trilinos/trilinos_vector.cpp
     )
 
 else()
@@ -143,23 +144,23 @@ add_executable(numeric_test test/numeric_test.cpp)
 gridpack_add_serial_unit_test(numeric numeric_test)
 
 
+# -------------------------------------------------------------
+# vector test suite
+# -------------------------------------------------------------
+add_executable(complex_vector_test test/vector_test.cpp)
+target_link_libraries(complex_vector_test gridpack_math ${target_libraries})
+gridpack_add_unit_test(complex_vector complex_vector_test)
+
+add_executable(real_vector_test test/vector_test.cpp)
+set_target_properties(real_vector_test
+  PROPERTIES
+  COMPILE_DEFINITIONS "TEST_REAL=YES"
+  )
+target_link_libraries(real_vector_test gridpack_math ${target_libraries})
+gridpack_add_unit_test(real_vector real_vector_test)
+
+
 if (GridPACK_MATH_PETSC)
-
-  # -------------------------------------------------------------
-  # vector test suite
-  # -------------------------------------------------------------
-  add_executable(complex_vector_test test/vector_test.cpp)
-  target_link_libraries(complex_vector_test gridpack_math ${target_libraries})
-  gridpack_add_unit_test(complex_vector complex_vector_test)
-
-  add_executable(real_vector_test test/vector_test.cpp)
-  set_target_properties(real_vector_test
-    PROPERTIES
-    COMPILE_DEFINITIONS "TEST_REAL=YES"
-    )
-  target_link_libraries(real_vector_test gridpack_math ${target_libraries})
-  gridpack_add_unit_test(real_vector real_vector_test)
-
 
   # -------------------------------------------------------------
   # matrix test suite (one each for dense and sparse)

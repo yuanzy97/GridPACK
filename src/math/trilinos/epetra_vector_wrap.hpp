@@ -3,7 +3,7 @@
 /**
  * @file   epetra_vector_wrap.hpp
  * @author William A. Perkins
- * @date   2015-12-09 10:13:01 d3g096
+ * @date   2015-12-10 11:52:26 d3g096
  * 
  * @brief  
  * 
@@ -60,7 +60,7 @@ public:
   ~EpetraVectorWrapper(void);
 
   /// Build a parallel::Communicator from the Vec instance
-  parallel::Communicator getCommunicator(void) const;
+  static parallel::Communicator getCommunicator(const Epetra_Vector& v);
  
   /// Get (a pointer to) the PETSc implementation
   const Epetra_Vector *getVector(void) const
@@ -131,6 +131,9 @@ public:
 
   /// Replace all elements with its reciprocal
   void reciprocal(void);
+
+  /// Make this instance ready to use
+  void ready(void);
 
   /// Print to named file or standard output
   void print(const char* filename = NULL) const;

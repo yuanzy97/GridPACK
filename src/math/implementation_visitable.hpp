@@ -10,7 +10,7 @@
 /**
  * @file   implementation_visitable.hpp
  * @author William A. Perkins
- * @date   2014-10-22 09:03:08 d3g096
+ * @date   2015-12-10 14:59:56 d3g096
  * 
  * @brief Declaration of the abstract ImplementationVisitable class.
  * 
@@ -46,7 +46,8 @@ class ImplementationVisitable {
 protected:
 
   /// Protected copy constructor to avoid unwanted copies.
-  ImplementationVisitable(const ImplementationVisitable& old);
+  ImplementationVisitable(const ImplementationVisitable& old)
+  {}
 
 public:
 

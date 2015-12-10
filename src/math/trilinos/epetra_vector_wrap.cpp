@@ -2,7 +2,7 @@
 /**
  * @file   epetra_vector_wrap.cpp
  * @author William A. Perkins
- * @date   2015-12-09 12:07:37 d3g096
+ * @date   2015-12-10 14:58:20 d3g096
  * 
  * @brief  
  * 
@@ -21,9 +21,12 @@
 #include <Epetra_MpiComm.h>
 #include <Epetra_LocalMap.h>
 #include <Epetra_Import.h>
+#include <EpetraExt_VectorOut.h>
+#include <EpetraExt_VectorIn.h>
 #include "trilinos/epetra_vector_wrap.hpp"
 #include "gridpack/utilities/null_deleter.hpp"
 #include "gridpack/utilities/exception.hpp"
+#include "implementation_visitor.hpp"
 
 namespace gridpack {
 namespace math {
@@ -31,6 +34,20 @@ namespace math {
 // -------------------------------------------------------------
 //  class EpetraVectorWrapper
 // -------------------------------------------------------------
+
+// -------------------------------------------------------------
+// EpetraVectorWrapper::getCommunicator (static member)
+// -------------------------------------------------------------
+parallel::Communicator 
+EpetraVectorWrapper::getCommunicator(const Epetra_Vector& v)
+{
+  const Epetra_Comm& comm(v.Comm());
+  // FIXME: dynamic_cast? really? Bad programmer. 
+  const Epetra_MpiComm& mpicomm(dynamic_cast<const Epetra_MpiComm&>(comm));
+  parallel::Communicator result(mpicomm.Comm());
+  return result;
+}
+
 
 // -------------------------------------------------------------
 // EpetraVectorWrapper:: constructors / destructor
@@ -191,6 +208,15 @@ EpetraVectorWrapper::reciprocal(void)
 }
 
 // -------------------------------------------------------------
+// EpetraVectorWrapper::ready
+// -------------------------------------------------------------
+void
+EpetraVectorWrapper::ready(void)
+{
+  // do nothing
+}
+
+// -------------------------------------------------------------
 // EpetraVectorWrapper::print
 // -------------------------------------------------------------
 void
@@ -204,6 +230,59 @@ EpetraVectorWrapper::print(const char* filename) const
     p_vector->Print(std::cout);
   }
 };
+
+// -------------------------------------------------------------
+// EpetraVectorWrapper::save
+// -------------------------------------------------------------
+void
+EpetraVectorWrapper::save(const char* filename) const
+{
+  int ierr(0);
+  ierr = EpetraExt::VectorToMatlabFile(filename, *p_vector);
+}
+
+// -------------------------------------------------------------
+// EpetraVectorWrapper::loadBinary
+// -------------------------------------------------------------
+void
+EpetraVectorWrapper::loadBinary(const char* filename)
+{
+  int ierr(0);
+  Epetra_Vector *in;
+  ierr = EpetraExt::MatrixMarketFileToVector(filename, p_vector->Map(), in);
+  *p_vector = *in;
+  if (ierr) {
+    throw gridpack::Exception("EpetraVectorWrapper::loadBinary failed");
+  }
+}
+
+// -------------------------------------------------------------
+// EpetraVectorWrapper::saveBinary
+// -------------------------------------------------------------
+void
+EpetraVectorWrapper::saveBinary(const char* filename) const
+{
+  int ierr(0);
+  ierr = EpetraExt::VectorToMatrixMarketFile(filename, *p_vector);
+  if (ierr) {
+    throw gridpack::Exception("EpetraVectorWrapper::saveBinary failed");
+  }
+}
+
+// -------------------------------------------------------------
+// EpetraVectorWrapper::p_accept
+// -------------------------------------------------------------
+void 
+EpetraVectorWrapper::p_accept(ImplementationVisitor& visitor)
+{
+  visitor.visit(*this);
+}
+
+void 
+EpetraVectorWrapper::p_accept(ConstImplementationVisitor& visitor) const
+{
+  visitor.visit(*this);
+}
 
 } // namespace math
 } // namespace gridpack
