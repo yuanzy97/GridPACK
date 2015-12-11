@@ -2,7 +2,7 @@
 /**
  * @file   trilinos_vector.cpp
  * @author William A. Perkins
- * @date   2015-12-10 14:26:47 d3g096
+ * @date   2015-12-11 07:37:49 d3g096
  * 
  * @brief  
  * 
@@ -100,6 +100,8 @@ VectorT<T, I>::add(const VectorT<T, I>& x, const VectorT<T, I>::TheType& scale)
     // This call computes y = beta*x + alpha*y. Where y is p_vector.  
     
     int ierr = yvec->Update(alpha, *xvec, beta);
+    if (ierr) 
+      throw Exception("Epetra_Vector::Update() failure");
   } else {
     scaleAdd2<T> op(scale);
     applyBinaryOperator<T>(yvec, xvec, op);
@@ -158,7 +160,6 @@ VectorT<T, I>::elementMultiply(const VectorT<T, I>& x)
   this->p_checkCompatible(x);
   Epetra_Vector *vec(GetEpetraVector(*this));
   const Epetra_Vector *xvec(GetEpetraVector(x));
-  int ierr(0);
   multiplyvalue2<T> op;
   applyBinaryOperator<T>(vec, xvec, op);
 }  
@@ -176,7 +177,6 @@ VectorT<T, I>::elementDivide(const VectorT<T, I>& x)
   this->p_checkCompatible(x);
   Epetra_Vector *vec(GetEpetraVector(*this));
   const Epetra_Vector *xvec(GetEpetraVector(x));
-  int ierr(0);
   dividevalue2<T> op;
   applyBinaryOperator<T>(vec, xvec, op);
 }  

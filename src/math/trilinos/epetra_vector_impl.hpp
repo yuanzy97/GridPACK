@@ -3,7 +3,7 @@
 /**
  * @file   epetra_vector_impl.hpp
  * @author William A. Perkins
- * @date   2015-12-10 12:52:14 d3g096
+ * @date   2015-12-11 07:54:38 d3g096
  * 
  * @brief  
  * 
@@ -164,9 +164,9 @@ protected:
     ValueTransferToLibrary<TheType, TrilinosScalar> trans(n, const_cast<TheType *>(x));
     trans.go();
     if (addem) {
-      ierr = v->SumIntoGlobalValues(n, trans.to(), theindexes);
+      ierr = v->SumIntoGlobalValues(n*elementSize, trans.to(), theindexes);
     } else {
-      ierr = v->ReplaceGlobalValues(n, trans.to(), theindexes);
+      ierr = v->ReplaceGlobalValues(n*elementSize, trans.to(), theindexes);
     }
     if (ierr) {
       throw Exception("Eptra_Vector::Replace/SumIntoGlobalValues failure");
@@ -206,9 +206,10 @@ protected:
   {
     if (useLibrary) {
       const Epetra_Vector *v = p_vwrap.getVector();
+      const Epetra_BlockMap& map(v->Map());
       TrilinosScalar pv;
-      TrilinosIndex tidx(i);
-      pv = (*v)[tidx];
+      TrilinosIndex lidx(map.LID(i));
+      pv = (*v)[lidx];
       x = equate<TheType, TrilinosScalar>(pv);
     } else {
       p_getElements(1, &i, &x);
@@ -219,16 +220,26 @@ protected:
   void p_getElements(const IdxType& n, const IdxType *i, TheType *x) const
   {
     const Epetra_Vector *v = p_vwrap.getVector();
-    std::vector<TrilinosScalar> px(n*elementSize);
+    const Epetra_BlockMap map(v->Map());
     TrilinosIndex idx;
-    for (int j = 0; j < n; ++j) {
-      idx = i[j]*elementSize;
-      px[j*elementSize] = (*v)[idx];
-      if (elementSize > 1) 
-        px[j*elementSize+1] = (*v)[idx+1];
+
+    if (useLibrary) {
+      for (int j = 0; j < n; ++j) {
+        idx = map.LID(i[j]);
+        x[j] = (*v)[idx];
+      }
+    } else {
+      std::vector<TrilinosScalar> px(n*elementSize);
+      for (int j = 0; j < n; ++j) {
+        TrilinosIndex gid(i[j]*elementSize);
+        idx = map.LID(gid);
+        px[j*elementSize] = (*v)[idx];
+        if (elementSize > 1) 
+          px[j*elementSize+1] = (*v)[idx+1];
+      }
+      ValueTransferFromLibrary<TrilinosScalar, TheType> trans(n*elementSize, &px[0], x);
+      trans.go();
     }
-    ValueTransferFromLibrary<TrilinosScalar, TheType> trans(n*elementSize, &px[0], x);
-    trans.go();
   }
 
   /// Get all of vector elements (on all processes)
@@ -364,7 +375,7 @@ protected:
   /// Make this instance ready to use
   void p_ready(void)
   {
-    p_vwrap.ready();
+    this->communicator().barrier();
   }
 
   /// Allow visits by implemetation visitor

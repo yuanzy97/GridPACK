@@ -2,7 +2,7 @@
 /**
  * @file   epetra_vector_wrap.cpp
  * @author William A. Perkins
- * @date   2015-12-10 14:58:20 d3g096
+ * @date   2015-12-11 08:50:09 d3g096
  * 
  * @brief  
  * 
@@ -63,7 +63,7 @@ EpetraVectorWrapper::EpetraVectorWrapper(const parallel::Communicator& comm,
   Epetra_BlockMap emap(-1, local_length, 1, 0, ecomm);
   p_vector.reset(new Epetra_Vector(emap));
   p_minIndex = emap.MinMyGID();
-  p_maxIndex = emap.MaxMyGID();
+  p_maxIndex = emap.MaxMyGID() + 1;
 }
 
 EpetraVectorWrapper::EpetraVectorWrapper(Epetra_Vector& vec, const bool& copyVec)
@@ -78,7 +78,7 @@ EpetraVectorWrapper::EpetraVectorWrapper(Epetra_Vector& vec, const bool& copyVec
     p_vector.reset(new Epetra_Vector(vec));
   }
   p_minIndex = p_vector->Map().MinMyGID();
-  p_maxIndex = p_vector->Map().MaxMyGID();
+  p_maxIndex = p_vector->Map().MaxMyGID() + 1;
 }
 
 EpetraVectorWrapper::EpetraVectorWrapper(const EpetraVectorWrapper& old)
@@ -134,11 +134,15 @@ EpetraVectorWrapper::getAllElements(TrilinosScalar *x) const
 {
   const Epetra_BlockMap& gmap(p_vector->Map());
   const Epetra_Comm& ecomm(gmap.Comm());
-  Epetra_LocalMap lmap(this->size(), 0, ecomm);
-  Epetra_Vector lvect(lmap);
-  Epetra_Import importer(gmap, lmap); // FIXME: consider caching this
-  lvect.Import(*p_vector, importer, Insert);
-  lvect.ExtractCopy(x);
+  if (ecomm.NumProc() > 1) {
+    Epetra_LocalMap lmap(this->size(), 0, ecomm);
+    Epetra_Vector lvect(lmap);
+    Epetra_Import importer(lmap, gmap); // FIXME: consider caching this
+    lvect.Import(*p_vector, importer, Insert);
+    lvect.ExtractCopy(x);
+  } else {
+    p_vector->ExtractCopy(x);
+  }
 }
 
 // -------------------------------------------------------------
@@ -239,6 +243,9 @@ EpetraVectorWrapper::save(const char* filename) const
 {
   int ierr(0);
   ierr = EpetraExt::VectorToMatlabFile(filename, *p_vector);
+  if (ierr) {
+    throw Exception("EpetraExt::VectorToMatlabFile failure");
+  }
 }
 
 // -------------------------------------------------------------

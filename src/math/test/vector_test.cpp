@@ -8,7 +8,7 @@
 /**
  * @file   vector_construction_test.cpp
  * @author William A. Perkins
- * @date   2015-08-12 12:39:22 d3g096
+ * @date   2015-12-11 10:16:28 d3g096
  * 
  * @brief  Unit tests for gridpack::math::Vector
  * 
@@ -235,7 +235,7 @@ BOOST_AUTO_TEST_CASE( get_all )
   int lo, hi;
   v.localIndexRange(lo, hi);
   
-  std::vector<TestType> x(hi-lo, static_cast<double>(world.rank()));
+  std::vector<TestType> x(local_size, static_cast<double>(world.rank()));
   v.setElementRange(lo, hi, &x[0]);
 
   std::vector<TestType> all(world.size()*local_size);
@@ -555,6 +555,7 @@ BOOST_AUTO_TEST_CASE( reciprocal )
     TEST_VALUE_CLOSE(rx, y, delta);
   }
 }
+
 BOOST_AUTO_TEST_SUITE_END()
 
 BOOST_AUTO_TEST_SUITE( VectorIOTest )

@@ -9,7 +9,7 @@
 /**
  * @file   vector_implementation.h
  * @author William A. Perkins
- * @date   2015-08-14 12:18:33 d3g096
+ * @date   2015-12-11 08:47:40 d3g096
  * 
  * @brief  
  * 
@@ -85,10 +85,10 @@ protected:
   void p_buildRangeIdx(void) const
   {
     if (p_rangeIdx.empty()) {
-      IdxType n(this->size());
+      IdxType n(this->size()+1);
       p_rangeIdx.reserve(n);
       std::copy(boost::counting_iterator<int>(0),
-                boost::counting_iterator<int>(n),
+                boost::counting_iterator<int>(n+1),
                 std::back_inserter(p_rangeIdx));
     }
   }
