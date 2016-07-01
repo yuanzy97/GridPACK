@@ -10,7 +10,7 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created May  6, 2013 by William A. Perkins
-# Last Change: 2015-06-25 13:00:42 d3g096
+# Last Change: 2016-07-01 10:50:11 d3g096
 # -------------------------------------------------------------
 
 add_library(gridpack_parallel 
@@ -22,8 +22,13 @@ add_library(gridpack_parallel
 )
 
 include_directories(BEFORE ${CMAKE_CURRENT_SOURCE_DIR})
+set(target_libraries
+  ${Boost_LIBRARIES} ${MPI_CXX_LIBRARIES}
+)
+
 if (GA_FOUND)
-  include_directories(AFTER ${GA_INCLUDE_DIRS})
+  include_directories(BEFORE ${GA_INCLUDE_DIRS})
+  list(INSERT target_libraries 0 ${GA_LIBRARIES})
 endif()
 
 # -------------------------------------------------------------
@@ -57,8 +62,7 @@ install(TARGETS
 # A simple MPI program (that does not use boost::test)
 # -------------------------------------------------------------
 add_executable(greetings test/greetings.cpp)
-target_link_libraries(greetings gridpack_parallel 
-  ${GA_LIBRARIES} ${Boost_LIBRARIES} ${MPI_CXX_LIBRARIES})
+target_link_libraries(greetings gridpack_parallel ${target_libraries})
 
 if (NOT USE_PROGRESS_RANKS)
   add_test(greetings_serial greetings)
@@ -75,23 +79,27 @@ set_tests_properties(greetings_parallel
   PASS_REGULAR_EXPRESSION "I am process 0 of [1-9].*$"
 )
 
-# -------------------------------------------------------------
-# TEST: task_test
-# A simple program to test the task manager
-# -------------------------------------------------------------
-add_executable(task_test test/task_test.cpp)
-target_link_libraries(task_test gridpack_parallel 
-  ${GA_LIBRARIES} ${Boost_LIBRARIES} ${MPI_CXX_LIBRARIES})
-
-gridpack_add_run_test(task_test task_test "")
+if (GA_FOUND)
+  # -------------------------------------------------------------
+  # TEST: task_test
+  # A simple program to test the task manager
+  # -------------------------------------------------------------
+  add_executable(task_test test/task_test.cpp)
+  target_link_libraries(task_test 
+    gridpack_parallel 
+    ${target_libraries}
+    )
+  gridpack_add_run_test(task_test task_test "")
+endif(GA_FOUND)
 
 # -------------------------------------------------------------
 # TEST: mpi_test
 # A simple MPI test using boost::test
 # -------------------------------------------------------------
 add_executable(mpi_test test/mpi_test.cpp)
-target_link_libraries(mpi_test ${GA_LIBRARIES} ${Boost_LIBRARIES} ${MPI_CXX_LIBRARIES})
-
+target_link_libraries(mpi_test 
+  ${target_libraries}
+)
 gridpack_add_unit_test(mpi_test mpi_test)
 
 # -------------------------------------------------------------
@@ -100,9 +108,7 @@ gridpack_add_unit_test(mpi_test mpi_test)
 add_executable(shuffle_test test/shuffle_test.cpp)
 target_link_libraries(shuffle_test 
   gridpack_parallel 
-  ${GA_LIBRARIES} 
-  ${Boost_LIBRARIES} 
-  ${MPI_CXX_LIBRARIES}
+  ${target_libraries}
 )
 gridpack_add_unit_test(shuffle shuffle_test)
 
@@ -111,9 +117,11 @@ gridpack_add_unit_test(shuffle shuffle_test)
 # A simple program to test the task manager
 # -------------------------------------------------------------
 add_executable(hash_test test/hash_test.cpp)
-target_link_libraries(hash_test gridpack_parallel 
-  ${GA_LIBRARIES} ${Boost_LIBRARIES} ${MPI_CXX_LIBRARIES} gridpack_timer)
-
+target_link_libraries(hash_test 
+  gridpack_parallel 
+  gridpack_timer
+  ${target_libraries}
+)
 gridpack_add_unit_test(hash_test hash_test)
 
 # -------------------------------------------------------------
@@ -121,7 +129,19 @@ gridpack_add_unit_test(hash_test hash_test)
 # A simple program to test the random number generator
 # -------------------------------------------------------------
 add_executable(random_test test/random_test.cpp)
-target_link_libraries(random_test gridpack_parallel 
-  ${GA_LIBRARIES} ${Boost_LIBRARIES} ${MPI_CXX_LIBRARIES})
-
+target_link_libraries(random_test 
+    gridpack_parallel 
+    ${target_libraries}
+)
 gridpack_add_run_test(random_test random_test "")
+
+# -------------------------------------------------------------
+# TEST: reduce_test
+# Test the various all_reduce member functions of Communicator
+# -------------------------------------------------------------
+add_executable(reduce_test test/reduce_test.cpp)
+target_link_libraries(reduce_test 
+  gridpack_parallel 
+  ${target_libraries}
+)
+gridpack_add_run_test(reduce_test reduce_test "")

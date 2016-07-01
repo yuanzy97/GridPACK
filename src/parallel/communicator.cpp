@@ -9,18 +9,20 @@
 /**
  * @file   communicator.cpp
  * @author William A. Perkins
- * @date   2015-05-22 09:47:03 d3g096
+ * @date   2016-07-01 10:25:48 d3g096
  * 
  * @brief  
  * 
  * 
  */
 // -------------------------------------------------------------
-
+#if GRIDPACK_HAVE_GA
 #if USE_PROGRESS_RANKS
 #include <ga-mpi.h>
 #endif
 #include <ga++.h>
+#endif
+
 #include "gridpack/utilities/uncopyable.hpp"
 #include "communicator.hpp"
 
@@ -30,17 +32,100 @@ namespace parallel {
 // -------------------------------------------------------------
 //  class CommunicatorPrivate
 // -------------------------------------------------------------
-class CommunicatorPrivate {
+class CommunicatorPrivate 
+  : private utility::Uncopyable
+{
 public:
 
   /// Default constructor.
   CommunicatorPrivate(void)
-    : p_handle(GA_Pgroup_get_world())
+  { }
+
+  /// Destructor
+  virtual ~CommunicatorPrivate(void)
+  { 
+  }
+
+  /// Get GA process group handle
+  virtual int handle(void) const = 0;
+
+  /// Mimic GA sync
+  virtual void sync(void) const = 0;
+
+  /// Get the world rank
+  virtual int worldRank(void) const = 0;
+
+};
+
+// -------------------------------------------------------------
+// class CommunicatorPrivateMPI
+// -------------------------------------------------------------
+class CommunicatorPrivateMPI
+  : public CommunicatorPrivate
+{
+public:
+
+  /// Default constructor.
+  CommunicatorPrivateMPI(void)
+    : CommunicatorPrivate(), p_comm()
+  {}
+
+  CommunicatorPrivateMPI(const boost::mpi::communicator& comm)
+    : CommunicatorPrivate(), p_comm(comm)
+  { }
+
+  /// Destructor
+  ~CommunicatorPrivateMPI(void)
+  { 
+  }
+
+  /// Get GA process group handle
+  int handle(void) const
+  {
+    // This should not get called, so just return a bogus number
+    return -9999;
+  }
+
+  /// Mimic GA sync
+  void sync(void) const
+  {
+    p_comm.barrier();
+  }
+
+  /// Get the world rank
+  int worldRank(void) const
+  {
+    // This should not get called w/o GA, so just return a bogus number
+    return -9999;
+  }
+
+protected:
+
+  boost::mpi::communicator p_comm;
+};
+
+
+
+
+#if GRIDPACK_HAVE_GA
+
+// -------------------------------------------------------------
+//  class CommunicatorPrivateGA
+// -------------------------------------------------------------
+class CommunicatorPrivateGA 
+  : public CommunicatorPrivate
+{
+public:
+
+  /// Default constructor.
+  CommunicatorPrivateGA(void)
+    : CommunicatorPrivate(),
+      p_handle(GA_Pgroup_get_world())
   { }
 
   /// Construct on the processes in the specified communicators
-  CommunicatorPrivate(const boost::mpi::communicator& comm)
-    : p_handle()
+  CommunicatorPrivateGA(const boost::mpi::communicator& comm)
+    : CommunicatorPrivate(), p_handle()
   {
     int me(comm.rank()), nprocs(comm.size());
     int gaWrld = GA_Pgroup_get_world();
@@ -55,7 +140,7 @@ public:
   }
 
   /// Destructor
-  ~CommunicatorPrivate(void)
+  ~CommunicatorPrivateGA(void)
   { 
     if (p_handle != GA_Pgroup_get_world()){
       GA_Pgroup_destroy(p_handle);
@@ -63,18 +148,36 @@ public:
   }
 
   /// Get GA process group handle
-  const int& handle(void) const
+  int handle(void) const
   {
     return p_handle;
   }
 
-private:
+  /// Sync GA process group
+  void sync(void) const
+  {
+    GA_Pgroup_sync(p_handle);
+  }    
 
+  int worldRank(void) const
+  {
+    return GA::SERVICES.nodeid();
+  }
+
+protected:
+  
   /// The GA process group handle
   int p_handle;
-  
+
 };
 
+typedef CommunicatorPrivateGA TheCommunicatorPrivate;
+
+#else
+
+typedef CommunicatorPrivateMPI TheCommunicatorPrivate;
+
+#endif
 
 // -------------------------------------------------------------
 //  class Communicator
@@ -83,34 +186,30 @@ private:
 // -------------------------------------------------------------
 // Communicator:: constructors / destructor
 // -------------------------------------------------------------
+
 Communicator::Communicator(void)
 #if USE_PROGRESS_RANKS
   : p_comm(GA_MPI_Comm(),boost::mpi::comm_duplicate),
-    p_private(new CommunicatorPrivate())
+    p_private(new CommunicatorPrivateGA())
 #else
-  : p_comm(), p_private(new CommunicatorPrivate())
+  : p_comm(), p_private(new TheCommunicatorPrivate())
 #endif
-{
-  
-}
-
-Communicator::Communicator(const Communicator& old)
-  : p_comm(old.p_comm), p_private(old.p_private)
-{
-}
+{}
 
 Communicator::Communicator(const boost::mpi::communicator& comm)
-  : p_comm(comm), p_private(new CommunicatorPrivate(p_comm))
-{
-}
+  : p_comm(comm), p_private(new TheCommunicatorPrivate(p_comm))
+{}
 
 
 Communicator::Communicator(const MPI_Comm& comm)
   : p_comm(comm, boost::mpi::comm_duplicate),
-    p_private(new CommunicatorPrivate(p_comm))
-{
-}
+    p_private(new TheCommunicatorPrivate(p_comm))
+{}
 
+
+Communicator::Communicator(const Communicator& old)
+  : p_comm(old.p_comm), p_private(old.p_private)
+{}
 
 Communicator::~Communicator(void)
 {
@@ -143,7 +242,7 @@ Communicator::operator= (const Communicator & rhs)
 int 
 Communicator::worldRank(void) const
 {
-  return GA::SERVICES.nodeid();
+  return p_private->worldRank();
 }
 
 // -------------------------------------------------------------
@@ -152,7 +251,11 @@ Communicator::worldRank(void) const
 int
 Communicator::getGroup(void) const
 {
-  return p_private->handle();
+  int result(-9999);
+  if (p_private) {
+    result = p_private->handle();
+  }
+  return result;
 }
 
 // -------------------------------------------------------------
@@ -194,162 +297,14 @@ Communicator::divide(int nsize) const
 void 
 Communicator::sync(void) const
 {
-  GA_Pgroup_sync(p_private->handle());
+  if (p_private) {
+    p_private->sync();
+  } else {
+    this->barrier();
+  }
 }    
 
-/**
- * Sum vector over all processors in the communicator
- * @param x vector of values to be summed
- * @param nvals number of values in vector
- */
-void Communicator::sum(float *x, int nvals) const
-{
-  int i;
-  float *src = new float[nvals];
-  float *dest = new float[nvals];
-  for (i=0; i<nvals; i++) {
-    src[i] = x[i];
-  }
-  boost::mpi::all_reduce(p_comm, &src[0], nvals, &dest[0], std::plus<float>());
-  for (i=0; i<nvals; i++) {
-    x[i] = dest[i];
-  }
-  delete [] src;
-  delete [] dest;
-}
 
-void Communicator::sum(double *x, int nvals) const
-{
-  int i;
-  double *src = new double[nvals];
-  double *dest = new double[nvals];
-  for (i=0; i<nvals; i++) {
-    src[i] = x[i];
-  }
-  boost::mpi::all_reduce(p_comm, &src[0], nvals, &dest[0], std::plus<double>());
-  for (i=0; i<nvals; i++) {
-    x[i] = dest[i];
-  }
-  delete [] src;
-  delete [] dest;
-}
-
-void Communicator::sum(int *x, int nvals) const
-{
-  int i;
-  int *src = new int[nvals];
-  int *dest = new int[nvals];
-  for (i=0; i<nvals; i++) {
-    src[i] = x[i];
-  }
-  boost::mpi::all_reduce(p_comm, &src[0], nvals, &dest[0], std::plus<int>());
-  for (i=0; i<nvals; i++) {
-    x[i] = dest[i];
-  }
-  delete [] src;
-  delete [] dest;
-}
-
-void Communicator::sum(long *x, int nvals) const
-{
-  int i;
-  long *src = new long[nvals];
-  long *dest = new long[nvals];
-  for (i=0; i<nvals; i++) {
-    src[i] = x[i];
-  }
-  boost::mpi::all_reduce(p_comm, &src[0], nvals, &dest[0], std::plus<long>());
-  for (i=0; i<nvals; i++) {
-    x[i] = dest[i];
-  }
-  delete [] src;
-  delete [] dest;
-}
-
-void Communicator::sum(gridpack::ComplexType *x, int nvals) const
-{
-  int i;
-  gridpack::ComplexType *src = new gridpack::ComplexType[nvals];
-  gridpack::ComplexType *dest = new gridpack::ComplexType[nvals];
-  for (i=0; i<nvals; i++) {
-    src[i] = x[i];
-  }
-  boost::mpi::all_reduce(p_comm, &src[0], nvals, &dest[0],
-      std::plus<gridpack::ComplexType>());
-  for (i=0; i<nvals; i++) {
-    x[i] = dest[i];
-  }
-  delete [] src;
-  delete [] dest;
-}
-
-/**
- * Find maximum of vector components over all processors
- * in the communicator
- * @param x vector of values to be evaluated
- * @param nvals number of values in vector
- */
-void Communicator::max(float *x, int nvals) const
-{
-  char cmax[4];
-  strcpy(cmax,"max");
-  GA_Fgop(x,nvals,cmax);
-}
-
-void Communicator::max(double *x, int nvals) const
-{
-  char cmax[4];
-  strcpy(cmax,"max");
-  GA_Dgop(x,nvals,cmax);
-}
-
-void Communicator::max(int *x, int nvals) const
-{
-  char cmax[4];
-  strcpy(cmax,"max");
-  GA_Igop(x,nvals,cmax);
-}
-
-void Communicator::max(long *x, int nvals) const
-{
-  char cmax[4];
-  strcpy(cmax,"max");
-  GA_Lgop(x,nvals,cmax);
-}
-
-/**
- * Find minimum of vector components over all processors
- * in the communicator
- * @param x vector of values to be evaluated
- * @param nvals number of values in vector
- */
-void Communicator::min(float *x, int nvals) const
-{
-  char cmin[4];
-  strcpy(cmin,"min");
-  GA_Fgop(x,nvals,cmin);
-}
-
-void Communicator::min(double *x, int nvals) const
-{
-  char cmin[4];
-  strcpy(cmin,"min");
-  GA_Dgop(x,nvals,cmin);
-}
-
-void Communicator::min(int *x, int nvals) const
-{
-  char cmin[4];
-  strcpy(cmin,"min");
-  GA_Igop(x,nvals,cmin);
-}
-
-void Communicator::min(long *x, int nvals) const
-{
-  char cmin[4];
-  strcpy(cmin,"min");
-  GA_Lgop(x,nvals,cmin);
-}
 
 } // namespace parallel
 } // namespace gridpack

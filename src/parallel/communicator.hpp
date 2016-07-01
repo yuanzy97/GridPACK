@@ -8,7 +8,7 @@
 /**
  * @file   communicator.hpp
  * @author William A. Perkins
- * @date   2015-08-11 14:23:12 d3g096
+ * @date   2016-07-01 09:13:11 d3g096
  * 
  * @brief  
  * 
@@ -138,11 +138,14 @@ public:
    * @param x vector of values to be summed
    * @param nvals number of values in vector
    */
-  void sum(float *x, int nvals) const;
-  void sum(double *x, int nvals) const;
-  void sum(int *x, int nvals) const;
-  void sum(long *x, int nvals) const;
-  void sum(gridpack::ComplexType *x, int nvals) const;
+  template <typename T>
+  void sum(T *x, int nvals) const
+  {
+    boost::mpi::all_reduce(p_comm, 
+                           boost::mpi::inplace_t<T*>(&x[0]), 
+                           nvals, 
+                           std::plus<T>());
+  }
 
   /**
    * Find maximum of vector components over all processors
@@ -150,10 +153,14 @@ public:
    * @param x vector of values to be evaluated
    * @param nvals number of values in vector
    */
-  void max(float *x, int nvals) const;
-  void max(double *x, int nvals) const;
-  void max(int *x, int nvals) const;
-  void max(long *x, int nvals) const;
+  template <typename T>
+  void max(T *x, int nvals) const
+  {
+    boost::mpi::all_reduce(p_comm, 
+                           boost::mpi::inplace_t<T*>(&x[0]), 
+                           nvals, 
+                           boost::mpi::maximum<T>());
+  }
 
   /**
    * Find minimum of vector components over all processors
@@ -161,10 +168,14 @@ public:
    * @param x vector of values to be evaluated
    * @param nvals number of values in vector
    */
-  void min(float *x, int nvals) const;
-  void min(double *x, int nvals) const;
-  void min(int *x, int nvals) const;
-  void min(long *x, int nvals) const;
+  template <typename T>
+  void min(T *x, int nvals) const
+  {
+    boost::mpi::all_reduce(p_comm, 
+                           boost::mpi::inplace_t<T*>(&x[0]), 
+                           nvals, 
+                           boost::mpi::minimum<T>());
+  }
 
 protected:
   

@@ -7,7 +7,7 @@
 /**
  * @file   index_hash.cpp
  * @author Bruce Palmer
- * @date   2014-06-24 09:25:03 d3g293
+ * @date   2016-07-01 08:48:43 d3g096
  * 
  * @brief  
  * This is a utility that is designed to provide a relatively efficient way of
@@ -18,12 +18,13 @@
 
 // -------------------------------------------------------------
 
-#include <ga.h>
 #include <parallel/communicator.hpp>
+#if GRIDPACK_HAVE_GA
+#include <ga.h>
+#else
+#define HASH_WITH_MPI
+#endif
 #include "index_hash.hpp"
-
-//#define HASH_WITH_MPI
-
 
 // -------------------------------------------------------------
 //  class GlobalIndexHashMap

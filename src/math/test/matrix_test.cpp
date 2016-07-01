@@ -8,7 +8,7 @@
 /**
  * @file   matrix_test.cpp
  * @author William A. Perkins
- * @date   2015-08-12 15:31:13 d3g096
+ * @date   2016-07-01 12:29:53 d3g096
  * 
  * @brief  Unit tests for Matrix
  * 
@@ -946,11 +946,24 @@ testMatrixMultiply(TestMatrixType *A,
 BOOST_AUTO_TEST_CASE ( MatrixMatrixMultiplySame )
 {
   gridpack::parallel::Communicator world;
+  bool doit(true);
 
-  boost::scoped_ptr<TestMatrixType> 
-    A(new TestMatrixType(world, 2, 3, the_storage_type)),
-    B(new TestMatrixType(world, 3, 2, the_storage_type));
-  testMatrixMultiply(A.get(), B.get());
+#if defined(GRIDPACK_USING_PETSC) && !defined(GRIDPACK_HAVE_GA) && defined(TEST_DENSE)
+
+  // dense-dense matrix multiply cannot be done in parallel when PETSc
+  // is used and Global Arrays is not available, so only run the test
+  // serial
+  
+  doit = (world.size() == 1);
+
+#endif 
+
+  if (doit) {
+    boost::scoped_ptr<TestMatrixType> 
+      A(new TestMatrixType(world, 2, 3, the_storage_type)),
+      B(new TestMatrixType(world, 3, 2, the_storage_type));
+    testMatrixMultiply(A.get(), B.get());
+  }
 }
 
 BOOST_AUTO_TEST_CASE ( MatrixMatrixMultiplyDifferent )

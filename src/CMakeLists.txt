@@ -10,7 +10,7 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created May  3, 2013 by William A. Perkins
-# Last Change: 2016-07-01 08:31:09 d3g096
+# Last Change: 2016-07-01 12:43:03 d3g096
 # -------------------------------------------------------------
 
 cmake_minimum_required (VERSION 2.6.4)
@@ -152,6 +152,9 @@ if (NOT PETSC_CLANGUAGE_Cxx)
   message (FATAL_ERROR "PETSc installation does not use C++ (--with-clanguage=c++)")
 endif()
 
+if (PETSC_FOUND)
+  add_definitions(-DGRIDPACK_USING_PETSC=1)
+endif (PETSC_FOUND)
 # -------------------------------------------------------------
 # ParMETIS
 # 
@@ -269,7 +272,7 @@ add_subdirectory(timer)
 add_subdirectory(math)
 
 # These sub directories really cannot be built without GA
-if (FALSE)
+if (GA_FOUND)
   add_subdirectory(component)
   add_subdirectory(partition)
   add_subdirectory(network)
@@ -296,6 +299,6 @@ if (FALSE)
   add_subdirectory(parser)
   add_subdirectory(serial_io)
   add_subdirectory(include)
-endif (FALSE)
+endif (GA_FOUND)
 
 # add_subdirectory(lib)

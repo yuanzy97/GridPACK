@@ -7,7 +7,7 @@
 /**
  * @file   greetings.cpp
  * @author William A. Perkins
- * @date   2014-12-09 09:39:25 d3g096
+ * @date   2016-07-01 10:37:49 d3g096
  * 
  * @brief  A simple test of the GridPACK parallel environment
  * 
@@ -25,7 +25,6 @@
 // -------------------------------------------------------------
 
 #include <iostream>
-#include <ga.h>
 #include "gridpack/parallel/parallel.hpp"
 
 // -------------------------------------------------------------

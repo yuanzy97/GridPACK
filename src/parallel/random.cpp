@@ -8,7 +8,7 @@
 /**
  * @file   random.cpp
  * @author Bruce Palmer
- * @date   2015-03-03 09:25:03 d3g293
+ * @date   2016-07-01 10:37:20 d3g096
  * 
  * @brief  
  * This is a wrapper for a random number generator. The current implementation
@@ -19,9 +19,9 @@
 
 // -------------------------------------------------------------
 
-#include <ga.h>
 #include <cstdlib>
-#include <math.h>
+#include <unistd.h>
+#include <cmath>
 
 #include "gridpack/parallel/random.hpp"
 
@@ -51,7 +51,7 @@ Random::Random(int seed)
   p_gset = 0.0;
   p_rand_max_i = 1.0/static_cast<double>(RAND_MAX);
   if (seed < 0) seed = -seed;
-  seed += GA_Nodeid();
+  seed += ::getpid();
   srand(static_cast<unsigned int>(seed));
 }
 
@@ -69,7 +69,7 @@ Random::~Random(void)
 void Random::Random::seed(int seed)
 {
   if (seed < 0) seed = -seed;
-  seed += GA_Nodeid();
+  seed += ::getpid();
   srand(static_cast<unsigned int>(seed));
 }
 

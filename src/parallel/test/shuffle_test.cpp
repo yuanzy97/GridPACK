@@ -6,7 +6,7 @@
 /**
  * @file   shuffle_test.cpp
  * @author William A. Perkins
- * @date   2014-12-09 09:43:15 d3g096
+ * @date   2016-07-01 10:47:42 d3g096
  * 
  * @brief  A test of the Shuffler<> class
  * 
@@ -26,7 +26,10 @@
 
 #include "printit.hpp"
 #include "shuffler.hpp"
+
+#if GRIDPACK_HAVE_GA
 #include "ga_shuffler.hpp"
+#endif 
 
 // -------------------------------------------------------------
 // struct Tester
@@ -183,6 +186,8 @@ BOOST_AUTO_TEST_CASE( multi_tester_shuffle )
 
 BOOST_AUTO_TEST_SUITE_END( )
 
+#if GRIDPACK_HAVE_GA
+
 BOOST_AUTO_TEST_SUITE( gaShufflerTest )
 
 BOOST_AUTO_TEST_CASE( stringShuffle )
@@ -243,6 +248,8 @@ BOOST_AUTO_TEST_CASE( testerShuffle )
 
 
 BOOST_AUTO_TEST_SUITE_END( )
+
+#endif
 
 bool init_function()
 {

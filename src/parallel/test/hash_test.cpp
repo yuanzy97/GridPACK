@@ -5,17 +5,12 @@
  */
 #include <vector>
 
-#include <boost/mpi/environment.hpp>
-#include <boost/mpi/communicator.hpp>
-#include <boost/mpi/collectives.hpp>
 #define BOOST_TEST_NO_MAIN
 #define BOOST_TEST_ALTERNATIVE_INIT_API
 #include <boost/test/included/unit_test.hpp>
 
-#include "mpi.h"
-#include <macdecls.h>
-#include "gridpack/network/base_network.hpp"
-#include "gridpack/parallel/index_hash.hpp"
+#include "parallel.hpp"
+#include "index_hash.hpp"
 #include "gridpack/timer/coarse_timer.hpp"
 
 #define XDIM 100

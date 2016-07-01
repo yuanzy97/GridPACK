@@ -8,7 +8,7 @@
 /**
  * @file   petsc_matrix_operations.cpp
  * @author William A. Perkins
- * @date   2015-08-06 15:11:04 d3g096
+ * @date   2016-07-01 11:07:34 d3g096
  * 
  * @brief  
  * 
@@ -32,7 +32,10 @@
 #include "petsc/petsc_matrix_extractor.hpp"
 #include "petsc/petsc_vector_implementation.hpp"
 #include "petsc/petsc_vector_extractor.hpp"
+
+#if GRIDPACK_HAVE_GA
 #include "petsc/ga_matrix.hpp"
+#endif
 
 namespace gridpack {
 namespace math {
@@ -433,6 +436,8 @@ PetscErrorCode
 multiply_dense(const Mat& A, const Mat& B, Mat& C)
 {
   PetscErrorCode ierr(0);
+
+#if GRIDPACK_HAVE_GA
   Mat Aga, Bga, Cga;
 
   ierr = MatConvertToDenseGA(A, &Aga); CHKERRQ(ierr);
@@ -443,6 +448,9 @@ multiply_dense(const Mat& A, const Mat& B, Mat& C)
   ierr = MatDestroy(&Aga); CHKERRQ(ierr);
   ierr = MatDestroy(&Bga); CHKERRQ(ierr);
   ierr = MatDestroy(&Cga); CHKERRQ(ierr);
+#else
+  throw Exception("parallel dense matrix-matrix multiply not implemented without GA");
+#endif
   return ierr;
 }
 
