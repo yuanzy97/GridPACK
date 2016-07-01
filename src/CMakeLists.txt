@@ -10,7 +10,7 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created May  3, 2013 by William A. Perkins
-# Last Change: 2016-06-16 14:32:18 d3g096
+# Last Change: 2016-07-01 08:31:09 d3g096
 # -------------------------------------------------------------
 
 cmake_minimum_required (VERSION 2.6.4)
@@ -33,10 +33,6 @@ include(GridPACK)
 enable_testing()
 
 # add user configuration options
-option (USE_PROGRESS_RANKS "Enable progress ranks in GridPACK" OFF)
-if (USE_PROGRESS_RANKS)
-  add_definitions (-DUSE_PROGRESS_RANKS=1)
-endif()
 
 # add GOSS directory
 option (GOSS_DIR "Point to directory with GOSS files" OFF)
@@ -176,31 +172,42 @@ find_package(ParMETIS REQUIRED)
 # 
 # Only versions > 5.2 have been used
 # -------------------------------------------------------------
+option (USE_PROGRESS_RANKS "Enable progress ranks in GridPACK" OFF)
 message(STATUS "Checking GA ...")
-find_package(GA REQUIRED)
+find_package(GA)
+
+if (GA_FOUND)
+  add_definitions(-DGRIDPACK_HAVE_GA=1)
+  if (USE_PROGRESS_RANKS)
+    add_definitions (-DUSE_PROGRESS_RANKS=1)
+  endif(USE_PROGRESS_RANKS)
+endif(GA_FOUND)
 
 # -------------------------------------------------------------
 #  Add optimization libraries, if requested
 # -------------------------------------------------------------
-# add the CPLEX library?
-if( USE_CPLEX)
-  message(STATUS "Checking cplex ...")
-  find_package(CPLEX REQUIRED)
-endif( USE_CPLEX)
 
-# add the GUROBI library?
-IF( USE_GUROBI)
-  message(STATUS "Checking Gurobi ...")
-  find_package(GUROBI REQUIRED)
-endif (USE_GUROBI)
-
-if(USE_GLPK)
-  message(STATUS "Checking glpk ...")
-  find_package(GLPK REQUIRED)
-endif(USE_GLPK)
-
-#message(STATUS "Checking concert ...")
-#find_package(CONCERT REQUIRED)
+if (GA_FOUND)
+  # add the CPLEX library?
+  if( USE_CPLEX)
+    message(STATUS "Checking cplex ...")
+    find_package(CPLEX REQUIRED)
+  endif( USE_CPLEX)
+  
+  # add the GUROBI library?
+  IF( USE_GUROBI)
+    message(STATUS "Checking Gurobi ...")
+    find_package(GUROBI REQUIRED)
+  endif (USE_GUROBI)
+  
+  if(USE_GLPK)
+    message(STATUS "Checking glpk ...")
+    find_package(GLPK REQUIRED)
+  endif(USE_GLPK)
+  
+  #message(STATUS "Checking concert ...")
+  #find_package(CONCERT REQUIRED)
+endif (GA_FOUND)
 
 # -------------------------------------------------------------
 # Doxygen
@@ -255,36 +262,40 @@ endif()
 # -------------------------------------------------------------
 # Subdirectories
 # -------------------------------------------------------------
-add_subdirectory(utilities)
 add_subdirectory(parallel)
+add_subdirectory(utilities)
 add_subdirectory(configuration)
-add_subdirectory(math)
-add_subdirectory(component)
-add_subdirectory(partition)
-add_subdirectory(network)
-add_subdirectory(factory)
-add_subdirectory(mapper)
-add_subdirectory(optimization)
-add_subdirectory(applications/powerflow)
-add_subdirectory(applications/powerflow2)
-add_subdirectory(applications/dynamic_simulation_reduced_y)
-add_subdirectory(applications/dynamic_simulation_full_y)
-add_subdirectory(applications/dynamic_simulation_implicit)
-add_subdirectory(applications/contingency_analysis)
-add_subdirectory(applications/state_estimation)
-add_subdirectory(applications/examples/hello_world)
-add_subdirectory(applications/examples/resistor_grid)
-add_subdirectory(applications/modules/powerflow)
-add_subdirectory(applications/modules/dynamic_simulation)
-add_subdirectory(applications/modules/dynamic_simulation_full_y)
-add_subdirectory(applications/modules/state_estimation)
-add_subdirectory(applications/components/ds_matrix)
-add_subdirectory(applications/components/se_matrix)
-add_subdirectory(applications/components/pf_matrix)
-add_subdirectory(applications/components/y_matrix)
-add_subdirectory(parser)
-add_subdirectory(serial_io)
 add_subdirectory(timer)
-add_subdirectory(include)
+add_subdirectory(math)
 
-add_subdirectory(lib)
+# These sub directories really cannot be built without GA
+if (FALSE)
+  add_subdirectory(component)
+  add_subdirectory(partition)
+  add_subdirectory(network)
+  add_subdirectory(factory)
+  add_subdirectory(mapper)
+  add_subdirectory(optimization)
+  add_subdirectory(applications/powerflow)
+  add_subdirectory(applications/powerflow2)
+  add_subdirectory(applications/dynamic_simulation_reduced_y)
+  add_subdirectory(applications/dynamic_simulation_full_y)
+  add_subdirectory(applications/dynamic_simulation_implicit)
+  add_subdirectory(applications/contingency_analysis)
+  add_subdirectory(applications/state_estimation)
+  add_subdirectory(applications/examples/hello_world)
+  add_subdirectory(applications/examples/resistor_grid)
+  add_subdirectory(applications/modules/powerflow)
+  add_subdirectory(applications/modules/dynamic_simulation)
+  add_subdirectory(applications/modules/dynamic_simulation_full_y)
+  add_subdirectory(applications/modules/state_estimation)
+  add_subdirectory(applications/components/ds_matrix)
+  add_subdirectory(applications/components/se_matrix)
+  add_subdirectory(applications/components/pf_matrix)
+  add_subdirectory(applications/components/y_matrix)
+  add_subdirectory(parser)
+  add_subdirectory(serial_io)
+  add_subdirectory(include)
+endif (FALSE)
+
+# add_subdirectory(lib)

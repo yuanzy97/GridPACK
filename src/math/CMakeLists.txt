@@ -7,14 +7,24 @@
 # distribution.
 # -------------------------------------------------------------
 # Created May  7, 2013 by William A. Perkins
-# Last Change: 2015-08-18 14:04:33 d3g096
+# Last Change: 2016-06-29 14:47:18 d3g096
 # -------------------------------------------------------------
 set(gridpack_math_sources)
+
+include_directories(BEFORE ${CMAKE_CURRENT_SOURCE_DIR})
+
 set(target_libraries 
   gridpack_configuration 
   gridpack_parallel 
   gridpack_timer
-  ${GA_LIBRARIES}
+)
+
+if (GA_FOUND)
+  include_directories(AFTER ${GA_INCLUDE_DIRS})
+  list(APPEND target_libraries ${GA_LIBRARIES})
+endif(GA_FOUND) 
+
+list(APPEND target_libraries
   ${Boost_LIBRARIES}
   ${MPI_CXX_LIBRARIES}
 )
@@ -59,11 +69,6 @@ set(gridpack_math_headers
   numeric_type_check.hpp
 )
 
-include_directories(BEFORE ${CMAKE_CURRENT_SOURCE_DIR})
-if (GA_FOUND)
-    include_directories(AFTER ${GA_INCLUDE_DIRS})
-endif()
-
 # implementation specific sources and flags
 if (PETSC_FOUND)
 
@@ -82,7 +87,6 @@ if (PETSC_FOUND)
       petsc/petsc_vector.cpp
       petsc/petsc_vector_wrapper.cpp
       petsc/petsc_matrix.cpp
-      petsc/ga_matrix.cpp
       petsc/petsc_matrix_operations.cpp
       petsc/petsc_matrix_wrapper.cpp
       petsc/petsc_matrix.cpp
@@ -92,6 +96,13 @@ if (PETSC_FOUND)
       petsc/petsc_nonlinear_solver.cpp
       petsc/petsc_dae_solver.cpp
     )  
+
+    if (GA_FOUND)
+      list(APPEND gridpack_math_sources
+        petsc/ga_matrix.cpp
+      )
+    endif(GA_FOUND)
+
 
     set(target_libraries ${PETSC_LIBRARIES} ${target_libraries})
 
