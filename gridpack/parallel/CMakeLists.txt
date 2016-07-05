@@ -17,7 +17,7 @@ add_library(gridpack_parallel
   environment.cpp
   communicator.cpp
   distributed.cpp
-  #index_hash.cpp
+  index_hash.cpp
   random.cpp
 )
 
@@ -116,13 +116,13 @@ gridpack_add_unit_test(shuffle shuffle_test)
 # TEST: hash_test
 # A simple program to test the task manager
 # -------------------------------------------------------------
-# add_executable(hash_test test/hash_test.cpp)
-# target_link_libraries(hash_test 
-#   gridpack_parallel 
-#   gridpack_timer
-#   ${target_libraries}
-# )
-# gridpack_add_unit_test(hash_test hash_test)
+add_executable(hash_test test/hash_test.cpp)
+target_link_libraries(hash_test 
+  gridpack_parallel 
+  gridpack_timer
+  ${target_libraries}
+)
+gridpack_add_unit_test(hash_test hash_test)
 
 # -------------------------------------------------------------
 # TEST: random_test

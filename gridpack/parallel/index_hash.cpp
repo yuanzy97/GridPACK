@@ -59,9 +59,9 @@ void GlobalIndexHashMap::addPairs(std::vector<std::pair<int,int> > &pairs)
   int size = pairs.size();
   // ndest[idx] number of values to send to processor idx, nrecv[idx] is number
   // of values received from processor idx
-  int ndest[p_nprocs], nrecv[p_nprocs];
+  std::vector<int> ndest(p_nprocs), nrecv(p_nprocs);
   // arrays for linked list
-  int ltop[p_nprocs], ldest[size];
+  std::vector<int> ltop(p_nprocs), ldest(size);
   // initialize all arrays
   for (i=0; i<p_nprocs; i++) {
     ndest[i] = 0;
@@ -84,7 +84,7 @@ void GlobalIndexHashMap::addPairs(std::vector<std::pair<int,int> > &pairs)
   // data will be received from other processors using an all-to-all call
   int ierr;
   int one = 1;
-  ierr = MPI_Alltoall(ndest, one, MPI_INT, nrecv, one, MPI_INT, p_comm);
+  ierr = MPI_Alltoall(&ndest[0], one, MPI_INT, &nrecv[0], one, MPI_INT, p_comm);
   // nrecv now contains the number of pairs that will be received from other
   // processors. Use this information to set up send and receive along with
   // their offsets for a all-to-all-v call
@@ -94,10 +94,10 @@ void GlobalIndexHashMap::addPairs(std::vector<std::pair<int,int> > &pairs)
     ndest[i] = 2*ndest[i];
     nrecv[i] = 2*nrecv[i];
   }
-  int send_pair[2*size];
-  int recv_pair[2*rsize];
-  int s_offsets[p_nprocs];
-  int r_offsets[p_nprocs];
+  std::vector<int> send_pair(2*size);
+  std::vector<int> recv_pair(2*rsize);
+  std::vector<int> s_offsets(p_nprocs);
+  std::vector<int> r_offsets(p_nprocs);
   s_offsets[0] = 0;
   r_offsets[0] = 0;
   for (i=1; i<p_nprocs; i++) {
@@ -119,8 +119,8 @@ void GlobalIndexHashMap::addPairs(std::vector<std::pair<int,int> > &pairs)
     }
   }
   // Send buffer is full so distribute contents to all processors
-  ierr = MPI_Alltoallv(send_pair, ndest, s_offsets, MPI_INT,
-      recv_pair, nrecv, r_offsets, MPI_INT, p_comm);
+  ierr = MPI_Alltoallv(&send_pair[0], &ndest[0], &s_offsets[0], MPI_INT,
+      &recv_pair[0], &nrecv[0], &r_offsets[0], MPI_INT, p_comm);
   // key-value pairs are available, so set up local hash table
   p_umap.clear();
   int first, second;
@@ -242,9 +242,9 @@ void GlobalIndexHashMap::addPairs(std::vector<std::pair<std::pair<int,int>,int> 
   int size = pairs.size();
   // ndest[idx] number of values to send to processor idx, nrecv[idx] is number
   // of values received from processor idx
-  int ndest[p_nprocs], nrecv[p_nprocs];
+  std::vector<int> ndest(p_nprocs), nrecv(p_nprocs);
   // arrays for linked list
-  int ltop[p_nprocs], ldest[size];
+  std::vector<int> ltop(p_nprocs), ldest(size);
   // initialize all arrays
   for (i=0; i<p_nprocs; i++) {
     ndest[i] = 0;
@@ -267,7 +267,7 @@ void GlobalIndexHashMap::addPairs(std::vector<std::pair<std::pair<int,int>,int> 
   // data will be received from other processors using an all-to-all call
   int ierr;
   int one = 1;
-  ierr = MPI_Alltoall(ndest, one, MPI_INT, nrecv, one, MPI_INT, p_comm);
+  ierr = MPI_Alltoall(&ndest[0], one, MPI_INT, &nrecv[0], one, MPI_INT, p_comm);
   // nrecv now contains the number of pairs that will be received from other
   // processors. Use this information to set up send and receive along with
   // their offsets for a all-to-all-v call
@@ -277,10 +277,10 @@ void GlobalIndexHashMap::addPairs(std::vector<std::pair<std::pair<int,int>,int> 
     ndest[i] = 3*ndest[i];
     nrecv[i] = 3*nrecv[i];
   }
-  int send_pair[3*size];
-  int recv_pair[3*rsize];
-  int s_offsets[p_nprocs];
-  int r_offsets[p_nprocs];
+  std::vector<int> send_pair(3*size);
+  std::vector<int> recv_pair(3*rsize);
+  std::vector<int> s_offsets(p_nprocs);
+  std::vector<int> r_offsets(p_nprocs);
   s_offsets[0] = 0;
   r_offsets[0] = 0;
   for (i=1; i<p_nprocs; i++) {
@@ -303,8 +303,8 @@ void GlobalIndexHashMap::addPairs(std::vector<std::pair<std::pair<int,int>,int> 
     }
   }
   // Send buffer is full so distribute contents to all processors
-  ierr = MPI_Alltoallv(send_pair, ndest, s_offsets, MPI_INT,
-      recv_pair, nrecv, r_offsets, MPI_INT, p_comm);
+  ierr = MPI_Alltoallv(&send_pair[0], &ndest[0], &s_offsets[0], MPI_INT,
+      &recv_pair[0], &nrecv[0], &r_offsets[0], MPI_INT, p_comm);
   // key-value pairs are available, so set up local hash table
   p_pmap.clear();
   int first, second, third;
@@ -427,9 +427,9 @@ void GlobalIndexHashMap::getValues(std::vector<int> &keys, std::vector<int> &val
   int size = keys.size();
   // ndest[idx] number of values to send to processor idx, nrecv[idx] is number
   // of values received from processor idx
-  int ndest[p_nprocs], nrecv[p_nprocs];
+  std::vector<int> ndest(p_nprocs), nrecv(p_nprocs);
   // arrays for linked list
-  int ltop[p_nprocs], ldest[size];
+  std::vector<int> ltop(p_nprocs), ldest(size);
   // initialize all arrays
   for (i=0; i<p_nprocs; i++) {
     ndest[i] = 0;
@@ -452,7 +452,7 @@ void GlobalIndexHashMap::getValues(std::vector<int> &keys, std::vector<int> &val
   // data will be received from other processors using an all-to-all call
   int ierr;
   int one = 1;
-  ierr = MPI_Alltoall(ndest, one, MPI_INT, nrecv, one, MPI_INT, p_comm);
+  ierr = MPI_Alltoall(&ndest[0], one, MPI_INT, &nrecv[0], one, MPI_INT, p_comm);
   // nrecv now contains the number of keys that will be received from other
   // processors. Use this information to set up send and receive along with
   // their offsets for an all-to-all-v call
@@ -460,10 +460,10 @@ void GlobalIndexHashMap::getValues(std::vector<int> &keys, std::vector<int> &val
   for (i=0; i<p_nprocs; i++) {
     rsize += nrecv[i];
   }
-  int send_keys[size];
-  int recv_keys[rsize];
-  int s_offsets[p_nprocs];
-  int r_offsets[p_nprocs];
+  std::vector<int> send_keys(size);
+  std::vector<int> recv_keys(rsize);
+  std::vector<int> s_offsets(p_nprocs);
+  std::vector<int> r_offsets(p_nprocs);
   s_offsets[0] = 0;
   r_offsets[0] = 0;
   for (i=1; i<p_nprocs; i++) {
@@ -485,8 +485,8 @@ void GlobalIndexHashMap::getValues(std::vector<int> &keys, std::vector<int> &val
     }
   }
   // Send buffer is full so distribute contents to all processors
-  ierr = MPI_Alltoallv(send_keys, ndest, s_offsets, MPI_INT,
-      recv_keys, nrecv, r_offsets, MPI_INT, p_comm);
+  ierr = MPI_Alltoallv(&send_keys[0], &ndest[0], &s_offsets[0], MPI_INT,
+      &recv_keys[0], &nrecv[0], &r_offsets[0], MPI_INT, p_comm);
   // keys are available, so find corresponding values. Need to pass through data
   // twice, once to evaluate how many values are being returned and once to set
   // up return data structures
@@ -516,7 +516,7 @@ void GlobalIndexHashMap::getValues(std::vector<int> &keys, std::vector<int> &val
     ndest[i] = 2*ndest[i];
     s_offsets[i] = 2*s_offsets[i];
   }
-  int send_values[2*size];
+  std::vector<int> send_values(2*size);
   // Pack returning data into send buffer
   count = 0;
   for (i=0; i<p_nprocs; i++) {
@@ -535,7 +535,7 @@ void GlobalIndexHashMap::getValues(std::vector<int> &keys, std::vector<int> &val
     }
   }
   // Send dimensions of returning blocks to all processors
-  ierr = MPI_Alltoall(ndest, one, MPI_INT, nrecv, one, MPI_INT, p_comm);
+  ierr = MPI_Alltoall(&ndest[0], one, MPI_INT, &nrecv[0], one, MPI_INT, p_comm);
 
   // Evaluate offsets for returning data
   r_offsets[0] = 0;
@@ -544,10 +544,10 @@ void GlobalIndexHashMap::getValues(std::vector<int> &keys, std::vector<int> &val
     r_offsets[i] = r_offsets[i-1] + nrecv[i-1];
     rsize += nrecv[i];
   }
-  int ret_values[rsize];
+  std::vector<int> ret_values(rsize);
   // send values back to requesting processor using all-to-all
-  ierr = MPI_Alltoallv(send_values, ndest, s_offsets, MPI_INT,
-      ret_values, nrecv, r_offsets, MPI_INT, p_comm);
+  ierr = MPI_Alltoallv(&send_values[0], &ndest[0], &s_offsets[0], MPI_INT,
+      &ret_values[0], &nrecv[0], &r_offsets[0], MPI_INT, p_comm);
   ierr = MPI_Barrier(p_comm);
 
   // repack data into output
@@ -787,9 +787,9 @@ void GlobalIndexHashMap::getValues(std::vector<std::pair<int,int> > &keys,
   int size = keys.size();
   // ndest[idx] number of values to send to processor idx, nrecv[idx] is number
   // of values received from processor idx
-  int ndest[p_nprocs], nrecv[p_nprocs];
+  std::vector<int> ndest(p_nprocs), nrecv(p_nprocs);
   // arrays for linked list
-  int ltop[p_nprocs], ldest[size];
+  std::vector<int> ltop(p_nprocs), ldest(size);
   // initialize all arrays
   for (i=0; i<p_nprocs; i++) {
     ndest[i] = 0;
@@ -812,7 +812,7 @@ void GlobalIndexHashMap::getValues(std::vector<std::pair<int,int> > &keys,
   // data will be received from other processors using an all-to-all call
   int ierr;
   int one = 1;
-  ierr = MPI_Alltoall(ndest, one, MPI_INT, nrecv, one, MPI_INT, p_comm);
+  ierr = MPI_Alltoall(&ndest[0], one, MPI_INT, &nrecv[0], one, MPI_INT, p_comm);
   // nrecv now contains the number of keys that will be received from other
   // processors. Use this information to set up send and receive along with
   // their offsets for an all-to-all-v call
@@ -820,10 +820,10 @@ void GlobalIndexHashMap::getValues(std::vector<std::pair<int,int> > &keys,
   for (i=0; i<p_nprocs; i++) {
     rsize += nrecv[i];
   }
-  int send_keys[2*size];
-  int recv_keys[2*rsize];
-  int s_offsets[p_nprocs];
-  int r_offsets[p_nprocs];
+  std::vector<int> send_keys(2*size);
+  std::vector<int> recv_keys(2*rsize);
+  std::vector<int> s_offsets(p_nprocs);
+  std::vector<int> r_offsets(p_nprocs);
   s_offsets[0] = 0;
   r_offsets[0] = 0;
   for (i=1; i<p_nprocs; i++) {
@@ -850,8 +850,8 @@ void GlobalIndexHashMap::getValues(std::vector<std::pair<int,int> > &keys,
     }
   }
   // Send buffer is full so distribute contents to all processors
-  ierr = MPI_Alltoallv(send_keys, ndest, s_offsets, MPI_INT,
-      recv_keys, nrecv, r_offsets, MPI_INT, p_comm);
+  ierr = MPI_Alltoallv(&send_keys[0], &ndest[0], &s_offsets[0], MPI_INT,
+      &recv_keys[0], &nrecv[0], &r_offsets[0], MPI_INT, p_comm);
   // keys are available, so find corresponding values. Need to pass through data
   // twice, once to evaluate how many values are being returned and once to set
   // up return data structures
@@ -883,7 +883,7 @@ void GlobalIndexHashMap::getValues(std::vector<std::pair<int,int> > &keys,
     ndest[i] = 3*ndest[i];
     s_offsets[i] = 3*s_offsets[i];
   }
-  int send_values[3*size];
+  std::vector<int> send_values(3*size);
   // Pack returning data into send buffer
   count = 0;
   for (i=0; i<p_nprocs; i++) {
@@ -904,7 +904,7 @@ void GlobalIndexHashMap::getValues(std::vector<std::pair<int,int> > &keys,
     }
   }
   // Send dimensions of returning blocks to all processors
-  ierr = MPI_Alltoall(ndest, one, MPI_INT, nrecv, one, MPI_INT, p_comm);
+  ierr = MPI_Alltoall(&ndest[0], one, MPI_INT, &nrecv[0], one, MPI_INT, p_comm);
 
   // Evaluate offsets for returning data
   r_offsets[0] = 0;
@@ -913,10 +913,10 @@ void GlobalIndexHashMap::getValues(std::vector<std::pair<int,int> > &keys,
     r_offsets[i] = r_offsets[i-1] + nrecv[i-1];
     rsize += nrecv[i];
   }
-  int ret_values[rsize];
+  std::vector<int> ret_values(rsize);
   // send values back to requesting processor using all-to-all
-  ierr = MPI_Alltoallv(send_values, ndest, s_offsets, MPI_INT,
-      ret_values, nrecv, r_offsets, MPI_INT, p_comm);
+  ierr = MPI_Alltoallv(&send_values[0], &ndest[0], &s_offsets[0], MPI_INT,
+      &ret_values[0], &nrecv[0], &r_offsets[0], MPI_INT, p_comm);
   ierr = MPI_Barrier(p_comm);
 
   // repack data into output
