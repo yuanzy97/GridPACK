@@ -104,15 +104,17 @@ if (PARMETIS_INCLUDE_DIR AND PARMETIS_LIBRARY AND METIS_LIBRARY)
 #include <mpi.h>
 #include <parmetis.h>
 
-int main()
+int main(int argc, char **argv)
 {
   // FIXME: Find a simple but sensible test for ParMETIS
 
+  int ierr(0);
+
   // Initialise MPI
-  MPI::Init();
+  ierr = MPI_Init(&argc, &argv);
 
   // Finalize MPI
-  MPI::Finalize();
+  ierr = MPI_Finalize();
 
   return 0;
 }

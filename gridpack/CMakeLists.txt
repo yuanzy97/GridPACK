@@ -150,13 +150,15 @@ endif (PETSC_FOUND)
 # -------------------------------------------------------------
 message(STATUS "Checking ParMETIS ...")
 
-# If ParMETIS is included in PETSc, use that installation. This will
-# override any specification on the command line.  
-#if (PETSC_HAVE_PARMETIS) 
-#  set(PARMETIS_DIR "${PETSC_DIR}/${PETSC_ARCH}")
-#endif()
-#find_package(ParMETIS REQUIRED)
-
+# If ParMETIS is downloaded and built with PETSc installation, that
+# installation should be used and PARMETIS_DIR should not be specified
+# on the command line.
+if (NOT PARMETIS_DIR)
+   if (PETSC_HAVE_PARMETIS) 
+     set(PARMETIS_DIR "${PETSC_DIR}/${PETSC_ARCH}")
+   endif()
+endif()
+find_package(ParMETIS REQUIRED)
 
 # -------------------------------------------------------------
 # GlobalArrays
