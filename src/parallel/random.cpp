@@ -8,7 +8,7 @@
 /**
  * @file   random.cpp
  * @author Bruce Palmer
- * @date   2016-07-01 10:37:20 d3g096
+ * @date   2016-07-01 14:49:54 d3g096
  * 
  * @brief  
  * This is a wrapper for a random number generator. The current implementation
@@ -66,7 +66,7 @@ Random::~Random(void)
  * Reinitialize random number generator with a new seed
  * @param seed random number generator initialization
  */
-void Random::Random::seed(int seed)
+void Random::seed(int seed)
 {
   if (seed < 0) seed = -seed;
   seed += ::getpid();
@@ -76,7 +76,7 @@ void Random::Random::seed(int seed)
 /**
  * Return a double precision random number in the range [0,1]
  */
-double Random::Random::drand(void)
+double Random::drand(void)
 {
   return rand()*p_rand_max_i;
 }
@@ -85,7 +85,7 @@ double Random::Random::drand(void)
  * Return a double precision random number from a gaussian distribution with
  * unit variance (p(x) = exp(-x*x/2)/sqrt(2*pi))
  */
-double Random::Random::grand(void)
+double Random::grand(void)
 {
   if (p_iset == 0) {
     double r = 2.0;
