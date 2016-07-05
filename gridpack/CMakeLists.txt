@@ -13,13 +13,13 @@
 # Last Change: 2016-07-01 12:43:03 d3g096
 # -------------------------------------------------------------
 
-cmake_minimum_required (VERSION 2.6.4)
+cmake_minimum_required (VERSION 2.8.8)
 project (GridPACK)
 
 #set (GridPACK_VERSION_MAJOR 1)
 #set (GridPACK_VERSION_MINOR 0)
 
-# This is a C++ project exclusively
+# This is a mainly a C++ project, but needs some C interfaces
 enable_language(CXX)
 
 # where to look for special .cmake files
@@ -73,18 +73,6 @@ if (ENABLE_CRAY_BUILD)
   set (CMAKE_FIND_LIBRARY_SUFFIXES ".a")
 endif()
 
-# This is here for cmake version 2.6 
-if (NOT MPI_LIBRARY OR NOT MPI_EXTRA_LIBRARY)
-# Punt if MPI_LIBRARY or MPI_EXTRA_LIBRARY not found
-  set(MPI_CXX_LIBRARIES "")
-else()
-  if (NOT MPI_CXX_LIBRARIES)
-   set(MPI_CXX_LIBRARIES 
-     ${MPI_LIBRARY} 
-     ${MPI_EXTRA_LIBRARY}
-   )
-  endif()
-endif()
 message(STATUS "MPI_CXX_LIBRARIES: ${MPI_CXX_LIBRARIES}")
 
 # Perkins found out that this was exactly the wrong thing to do:
@@ -164,10 +152,10 @@ message(STATUS "Checking ParMETIS ...")
 
 # If ParMETIS is included in PETSc, use that installation. This will
 # override any specification on the command line.  
-if (PETSC_HAVE_PARMETIS) 
-  set(PARMETIS_DIR "${PETSC_DIR}/${PETSC_ARCH}")
-endif()
-find_package(ParMETIS REQUIRED)
+#if (PETSC_HAVE_PARMETIS) 
+#  set(PARMETIS_DIR "${PETSC_DIR}/${PETSC_ARCH}")
+#endif()
+#find_package(ParMETIS REQUIRED)
 
 
 # -------------------------------------------------------------
@@ -252,9 +240,15 @@ if (CMAKE_COMPILER_IS_GNUCXX)
     )
 endif()
 
+# disable the annoying max/min macros in Windoze
+if (WIN32)
+   add_definitions(/D NOMINMAX)
+endif (WIN32)
+
 set(GRIDPACK_SRC_DIR ${CMAKE_CURRENT_SOURCE_DIR})
 
 include_directories(BEFORE ${CMAKE_CURRENT_SOURCE_DIR})
+include_directories(BEFORE ${CMAKE_CURRENT_SOURCE_DIR}/..)
 if (ENABLE_CRAY_BUILD)
   if (NOT ${MPI_LIBRARY} OR NOT ${MPI_EXTRA_LIBRARY})
     set(MPI_LIBRARY "")

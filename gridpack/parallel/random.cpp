@@ -19,8 +19,13 @@
 
 // -------------------------------------------------------------
 
-#include <cstdlib>
+#if defined(_WIN32)
+#include <process.h>
+#define getpid() _getpid()
+#else
 #include <unistd.h>
+#endif
+#include <cstdlib>
 #include <cmath>
 
 #include "gridpack/parallel/random.hpp"

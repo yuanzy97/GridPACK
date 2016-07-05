@@ -397,7 +397,8 @@ protected:
     if (useLibrary) {
       p_vwrap.reciprocal();
     } else {
-      reciprocal<TheType> op;
+      // full namespace required by MSVC, for some reason
+      gridpack::math::reciprocal<TheType> op;
       p_applyOperation(op);
     }
   }

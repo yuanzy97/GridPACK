@@ -15,6 +15,7 @@
 
 #include <iostream>
 #include <iterator>
+#include <string>
 #include <boost/lexical_cast.hpp>
 #include <boost/mpi/environment.hpp>
 #include <boost/mpi/communicator.hpp>
@@ -32,20 +33,20 @@
 #endif 
 
 // -------------------------------------------------------------
-// struct Tester
+// struct TesterThing
 // -------------------------------------------------------------
 /// A more complicated thing to shuffle
-struct Tester {
+struct TesterThing {
   int index;
   std::string label;
-  explicit Tester(int i) 
+  explicit TesterThing(int i) 
     : index(i), label("unset") 
   {
     char c('A');
     c += i%26;
     label = std::string((i % 10) + 1, c);
   }
-  Tester(void) 
+  TesterThing(void) 
     : index(-1), label("unset")
   {}
 private: 
@@ -58,7 +59,7 @@ private:
 };
 
 std::ostream& 
-operator<<(std::ostream& out, const Tester& t)
+operator<<(std::ostream& out, const TesterThing& t)
 {
   out << t.index << " (" << t.label << ")";
   return out;
@@ -129,21 +130,21 @@ BOOST_AUTO_TEST_CASE( tester_shuffle )
       boost::mpi::comm_duplicate);
   const int local_size(5);
   const int global_size(local_size*world.size());
-  std::vector<Tester> things;
+  std::vector<TesterThing> things;
   std::vector<int> dest;
   
   if (world.rank() == 0) {
     things.reserve(global_size);
     dest.reserve(global_size);
     for (int i = 0; i < local_size*world.size(); ++i) {
-      things.push_back(Tester(i));
+      things.push_back(TesterThing(i));
       dest.push_back(i % world.size());
     }
   }
 
   printit(world, things, "Before:");
 
-  gridpack::parallel::Shuffler<Tester> shuffle(world);
+  gridpack::parallel::Shuffler<TesterThing> shuffle(world);
   shuffle(things, dest);
 
   printit(world, things, "After:");
@@ -155,20 +156,20 @@ BOOST_AUTO_TEST_CASE( multi_tester_shuffle )
   boost::mpi::communicator world(static_cast<MPI_Comm>(comm),
       boost::mpi::comm_duplicate);
   const int local_size(5);
-  std::vector<Tester> things;
+  std::vector<TesterThing> things;
   std::vector<int> dest;
 
   things.reserve(local_size);
   dest.reserve(local_size);
   for (int i = 0; i < local_size; ++i) {
-    things.push_back(Tester(i));
+    things.push_back(TesterThing(i));
     dest.push_back(i % world.size());
   }
 
   printit(world, things, "Before:");
   printit(world, dest, "Destination:");
 
-  gridpack::parallel::Shuffler<Tester> shuffle(world);
+  gridpack::parallel::Shuffler<TesterThing> shuffle(world);
   shuffle(things, dest);
 
   printit(world, things, "After:");
@@ -225,21 +226,21 @@ BOOST_AUTO_TEST_CASE( testerShuffle )
       boost::mpi::comm_duplicate);
   const int local_size(5);
   const int global_size(local_size*world.size());
-  std::vector<Tester> things;
+  std::vector<TesterThing> things;
   std::vector<int> dest;
   
   if (world.rank() == 0) {
     things.reserve(global_size);
     dest.reserve(global_size);
     for (int i = 0; i < local_size*world.size(); ++i) {
-      things.push_back(Tester(i));
+      things.push_back(TesterThing(i));
       dest.push_back(i % world.size());
     }
   }
 
   printit(world, things, "Before:");
 
-  gridpack::parallel::gaShuffler<Tester> shuffler(world);
+  gridpack::parallel::gaShuffler<TesterThing> shuffler(world);
 
   shuffler(things, dest);
 

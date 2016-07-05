@@ -71,7 +71,7 @@ protected:
 };
 
 
-BOOST_AUTO_TEST_CASE( Configurable )
+BOOST_AUTO_TEST_CASE( ConfigurableTest )
 {
   std::auto_ptr<gridpack::utility::Configuration> 
     config(gridpack::utility::Configuration::configuration());
