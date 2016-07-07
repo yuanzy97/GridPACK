@@ -9,7 +9,7 @@
 /**
  * @file   vector.h
  * @author William A. Perkins
- * @date   2015-08-12 06:25:16 d3g096
+ * @date   2016-07-05 14:45:58 d3g096
  * 
  * @brief  Declaration of the Vector class
  * 
@@ -159,7 +159,7 @@ public:
    * @param x 
    * @param scale 
    */
-  void add(const VectorT& x, const TheType& scale = 1.0);
+  void add(const VectorT& x, const T& scale = 1.0);
 
   /// Add the specified value to all elements
   /** 
@@ -169,7 +169,7 @@ public:
    * 
    * @param x 
    */
-  void add(const TheType& x);
+  void add(const T& x);
 
   /// Copy the elements from the specified Vector
   /** 

@@ -10,7 +10,7 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created May  3, 2013 by William A. Perkins
-# Last Change: 2016-07-01 12:43:03 d3g096
+# Last Change: 2016-07-07 14:11:08 d3g096
 # -------------------------------------------------------------
 
 cmake_minimum_required (VERSION 2.8.8)
@@ -174,6 +174,8 @@ if (GA_FOUND)
   if (USE_PROGRESS_RANKS)
     add_definitions (-DUSE_PROGRESS_RANKS=1)
   endif(USE_PROGRESS_RANKS)
+else (GA_FOUND)
+  message(WARNING "Global Arrays was not found, only a limited GridPACK subset will be built")
 endif(GA_FOUND)
 
 # -------------------------------------------------------------
