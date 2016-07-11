@@ -1,5 +1,7 @@
 # GridPACK
 
+## Description
+
 GridPACK is a software framework consisting of a set of modules
 designed to simplify the development of programs that model the power
 grid and run on parallel, high performance computing platforms. The
@@ -13,4 +15,19 @@ as basic profiling and error management.
 
 See the [GridPACK home page](https://www.gridpack.org) for more information.
 
+## Cloning
+
+The GridPACK git repository uses submodules, so extra steps are
+required to clone:
+
+1. Clone the repository as you would normally
+```
+git clone -b windoze https://github.com/wperkins/GridPACK.git gridpack
+```
+2. Then update the submodules in source tree
+```
+cd gridpack
+git submodules init
+git submodules update 
+```
 
