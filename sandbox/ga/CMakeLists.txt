@@ -30,6 +30,15 @@ include_directories(AFTER ${MPI_INCLUDE_PATH})
 message(STATUS "MPI_CXX_LIBRARIES: ${MPI_CXX_LIBRARIES}")
 
 # -------------------------------------------------------------
+# Boost
+#
+# Find the Boost library. 
+# -------------------------------------------------------------
+message(STATUS "Checking Boost ...")
+find_package(Boost 1.52 REQUIRED)
+include_directories(BEFORE ${Boost_INCLUDE_DIR})
+
+# -------------------------------------------------------------
 # GlobalArrays
 # 
 # Only versions > 5.2 have been used
