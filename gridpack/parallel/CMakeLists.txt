@@ -73,8 +73,10 @@ if (NOT USE_PROGRESS_RANKS)
     )
 endif()
 
-add_test(greetings_parallel 
-  ${MPIEXEC} ${MPIEXEC_NUMPROC_FLAG} 4 ${MPIEXEC_PREFLAGS} greetings ${MPIEXEC_POSTFLAGS})
+add_test(NAME greetings_parallel 
+  COMMAND ${MPIEXEC} ${MPIEXEC_NUMPROC_FLAG} 4 ${MPIEXEC_PREFLAGS} $<TARGET_FILE:greetings> ${MPIEXEC_POSTFLAGS}
+  WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
+)
 set_tests_properties(greetings_parallel
   PROPERTIES 
   PASS_REGULAR_EXPRESSION "I am process 0 of [1-9].*$"
@@ -147,6 +149,7 @@ target_link_libraries(reduce_test
 )
 gridpack_add_run_test(reduce_test reduce_test "")
 
+if (GA_FOUND)
 # -------------------------------------------------------------
 # TEST: store_test
 # A simple program to test the global store module
@@ -156,3 +159,5 @@ target_link_libraries(store_test gridpack_parallel
   ${target_libraries})
 
 gridpack_add_run_test(store_test store_test "")
+endif (GA_FOUND)
+

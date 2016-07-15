@@ -13,6 +13,10 @@
 # Last Change: 2016-07-15 10:20:33 d3g096
 # -------------------------------------------------------------
 
+# This allows extraction of the "LOCATION" target property which is
+# deprecated in modern CMake versions
+cmake_policy(SET CMP0026 OLD)
+
 # This is used to specify a time out for GridPACK unit tests. It's 5
 # seconds by default, but may need to be longer on some platforms.
 if (NOT GRIDPACK_TEST_TIMEOUT) 
@@ -59,9 +63,10 @@ endfunction(gridpack_add_serial_run_test)
 function(gridpack_add_parallel_unit_test test_name test_target)
   set(the_test_name "${test_name}_parallel")
   if (TARGET ${test_target})
-    get_property(test_program TARGET ${test_target} PROPERTY LOCATION)
-    add_test("${the_test_name}"
-      ${MPIEXEC} ${MPIEXEC_NUMPROC_FLAG} ${MPIEXEC_MAX_NUMPROCS} ${MPIEXEC_PREFLAGS} ${test_program} ${MPIEXEC_POSTFLAGS})
+    add_test(NAME "${the_test_name}"
+      COMMAND ${MPIEXEC} ${MPIEXEC_NUMPROC_FLAG} ${MPIEXEC_MAX_NUMPROCS} ${MPIEXEC_PREFLAGS} $<TARGET_FILE:${test_target}> ${MPIEXEC_POSTFLAGS}
+      WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
+    )
     set_tests_properties("${the_test_name}"
       PROPERTIES 
       PASS_REGULAR_EXPRESSION "No errors detected"
@@ -83,9 +88,10 @@ endfunction(gridpack_add_parallel_unit_test)
 function(gridpack_add_parallel_run_test test_name test_target test_input)
   set(the_test_name "${test_name}_parallel")
   if (TARGET ${test_target})
-    get_property(test_program TARGET ${test_target} PROPERTY LOCATION)
-    add_test("${the_test_name}"
-      ${MPIEXEC} ${MPIEXEC_NUMPROC_FLAG} ${MPIEXEC_MAX_NUMPROCS} ${MPIEXEC_PREFLAGS} ${test_program} ${MPIEXEC_POSTFLAGS} ${test_input})
+    add_test(NAME "${the_test_name}"
+      COMMAND ${MPIEXEC} ${MPIEXEC_NUMPROC_FLAG} ${MPIEXEC_MAX_NUMPROCS} ${MPIEXEC_PREFLAGS} $<TARGET_FILE:${test_target}> ${MPIEXEC_POSTFLAGS} ${test_input}
+      WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
+    )
     set_tests_properties("${the_test_name}"
       PROPERTIES 
       TIMEOUT ${GRIDPACK_TEST_TIMEOUT}

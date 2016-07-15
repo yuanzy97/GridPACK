@@ -47,8 +47,8 @@ main(int argc, char **argv)
       if (i == me) {
         printf("I am process %d of %d.\n",me,nprocs);
       }
+      world.barrier();
     }
-    world.barrier();
 
     // Create two communicators, each containing half the processors
     if (me == 0) printf("\nCreating communicators using split:\n\n");
@@ -64,6 +64,7 @@ main(int argc, char **argv)
         if (i == me) 
           printf("I am process %d (original process is %d) of %d on communicator %d.\n",
               lcomm.rank(),me,lcomm.size(),color);
+	world.barrier();
       }
     }
 
@@ -78,6 +79,7 @@ main(int argc, char **argv)
         if (i == me) 
           printf("I am process %d (original process is %d) of %d.\n",
               lcomm.rank(),me,lcomm.size());
+	world.barrier();
       }
     }
 
