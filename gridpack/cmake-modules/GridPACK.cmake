@@ -10,12 +10,8 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created June 10, 2013 by William A. Perkins
-# Last Change: 2016-07-15 10:20:33 d3g096
+# Last Change: 2016-07-15 13:21:06 d3g096
 # -------------------------------------------------------------
-
-# This allows extraction of the "LOCATION" target property which is
-# deprecated in modern CMake versions
-cmake_policy(SET CMP0026 OLD)
 
 # This is used to specify a time out for GridPACK unit tests. It's 5
 # seconds by default, but may need to be longer on some platforms.
