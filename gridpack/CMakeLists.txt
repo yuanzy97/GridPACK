@@ -10,7 +10,7 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created May  3, 2013 by William A. Perkins
-# Last Change: 2016-07-07 14:11:08 d3g096
+# Last Change: 2016-07-15 10:33:07 d3g096
 # -------------------------------------------------------------
 
 cmake_minimum_required (VERSION 2.8.8)
@@ -240,7 +240,13 @@ endif(DOXYGEN_FOUND)
 # of string constants, which are used a lot in GridPACK
 if (CMAKE_COMPILER_IS_GNUCXX) 
     add_definitions(
-        -Wno-write-strings
+      -pedantic
+      -Wno-write-strings
+      -Wno-long-long 
+      -Wno-sign-compare 
+      -Wno-unused-variable
+      -Wno-unused-but-set-variable
+      -Wno-maybe-uninitialized
     )
 endif()
 
