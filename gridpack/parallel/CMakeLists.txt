@@ -10,7 +10,7 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created May  6, 2013 by William A. Perkins
-# Last Change: 2016-07-01 10:50:11 d3g096
+# Last Change: 2016-07-15 10:31:43 d3g096
 # -------------------------------------------------------------
 
 add_library(gridpack_parallel 
@@ -45,6 +45,7 @@ install(FILES
   task_manager.hpp
   random.hpp
   index_hash.hpp
+  global_store.hpp
   DESTINATION include/gridpack/parallel
 )
 
@@ -145,3 +146,13 @@ target_link_libraries(reduce_test
   ${target_libraries}
 )
 gridpack_add_run_test(reduce_test reduce_test "")
+
+# -------------------------------------------------------------
+# TEST: store_test
+# A simple program to test the global store module
+# -------------------------------------------------------------
+add_executable(store_test test/store_test.cpp)
+target_link_libraries(store_test gridpack_parallel 
+  ${target_libraries})
+
+gridpack_add_run_test(store_test store_test "")
