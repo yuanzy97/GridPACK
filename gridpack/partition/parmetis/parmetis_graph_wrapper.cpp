@@ -277,7 +277,7 @@ ParMETISGraphWrapper::get_csr_local(std::vector<idx_t>& vtxdist,
 
                                 // extract adjacency index
 
-  int maxdim(two);
+  const int maxdim(two);
   int lo[maxdim], hi[maxdim], ld[maxdim];
   ld[0] = 1;
   ld[1] = 1;

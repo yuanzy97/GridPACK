@@ -89,13 +89,13 @@ CreateMatGA(int pgroup, int lrows, int lcols, int grows, int gcols, int *ga)
 
   int nprocs = GA_Pgroup_nnodes(pgroup);
   int me = GA_Pgroup_nodeid(pgroup);
-  int tmapc[nprocs+1];
-  int mapc[nprocs+1];
+  std::vector<int> tmapc(nprocs+1);
+  std::vector<int> mapc(nprocs+1);
   int i;
 
   for (i = 0; i < nprocs+1; i++) tmapc[i] = 0;
   tmapc[me] = lrows;
-  GA_Pgroup_igop(pgroup, tmapc, nprocs+1, "+");
+  GA_Pgroup_igop(pgroup, &tmapc[0], nprocs+1, "+");
   mapc[0] = 0;
   for (i = 1; i < nprocs; i++) mapc[i] = mapc[i-1]+tmapc[i-1];
   mapc[nprocs] = 0;
@@ -105,7 +105,7 @@ CreateMatGA(int pgroup, int lrows, int lcols, int grows, int gcols, int *ga)
 
   *ga = GA_Create_handle();
   GA_Set_data(*ga, 2, dims, MT_PETSC_SCALAR);
-  GA_Set_irreg_distr(*ga, mapc, blocks);
+  GA_Set_irreg_distr(*ga, &mapc[0], blocks);
   GA_Set_pgroup(*ga, pgroup);
   if (!GA_Allocate(*ga)) {
     ierr = 1;

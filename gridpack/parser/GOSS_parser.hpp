@@ -73,8 +73,8 @@ class GOSS_parser : BaseParser<_network>
     /// Constructor
     explicit GOSS_parser(boost::shared_ptr<_network> network) :
       p_network(network), nBuses(0), nBranches(0)  , totalGenerators(0),
-      totalLines(0), totalTransformers(0), totalLoads(0), p_case_sbase(0.0),
-      p_case_id(0), p_configExists(false)
+      totalLines(0), totalLoads(0), totalTransformers(0), 
+      p_case_id(0), p_case_sbase(0.0), p_configExists(false)
     {
       this->setNetwork(network);
       p_comm = network->communicator();
