@@ -535,7 +535,7 @@ LPFileOptimizerImplementation::p_temporaryFileName(void)
 
   boost::system::error_code ec;
   file_status istat = status(tmp);
-  std::string result(tmp.c_str());
+  std::string result(tmp.string());
   return result;
   
 }

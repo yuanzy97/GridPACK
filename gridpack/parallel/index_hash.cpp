@@ -143,7 +143,7 @@ void GlobalIndexHashMap::addPairs(std::vector<std::pair<int,int> > &pairs)
   GA_Zero(g_offset);
 
   // Get offsets on remote processors
-  int r_offset[p_nprocs];
+  std::vector<int> r_offset(p_nprocs);
   for (j=0; j<p_nprocs; j++) {
     i = (j+p_me)%p_nprocs;
     if (ndest[i] > 0) {
@@ -154,12 +154,12 @@ void GlobalIndexHashMap::addPairs(std::vector<std::pair<int,int> > &pairs)
   }
   GA_Pgroup_sync(p_GAgrp);
   // Copy values from global array to local array and evaluate global offsets
-  int numValues[p_nprocs];
+  std::vector<int> numValues(p_nprocs);
   int lo, hi;
   lo = 0;
   hi = p_nprocs-1;
   if (p_me == 0) {
-    NGA_Get(g_offset,&lo,&hi,numValues,&one);
+    NGA_Get(g_offset,&lo,&hi,&numValues[0],&one);
   } else {
     for (i=0; i<p_nprocs; i++) {
       numValues[i] = 0;
@@ -167,7 +167,7 @@ void GlobalIndexHashMap::addPairs(std::vector<std::pair<int,int> > &pairs)
   }
   char plus[2];
   strcpy(plus,"+");
-  GA_Pgroup_igop(p_GAgrp, numValues, p_nprocs, plus);
+  GA_Pgroup_igop(p_GAgrp, &numValues[0], p_nprocs, plus);
   GA_Destroy(g_offset);
   int totalVals = 0;
   for (i=0; i<p_nprocs; i++) {
@@ -182,13 +182,13 @@ void GlobalIndexHashMap::addPairs(std::vector<std::pair<int,int> > &pairs)
   dims = totalVals+1;
   GA_Set_data(g_data,one,&dims,dtype);
   GA_Set_pgroup(g_data,p_GAgrp);
-  int mapc[p_nprocs];
+  std::vector<int> mapc(p_nprocs);
   mapc[0] = 0;
   for (i=1; i<p_nprocs; i++) {
     mapc[i] = mapc[i-1] + numValues[i-1];
   }
   blocks = p_nprocs;
-  GA_Set_irreg_distr(g_data,mapc,&blocks);
+  GA_Set_irreg_distr(g_data,&mapc[0],&blocks);
   GA_Allocate(g_data);
   NGA_Deregister_type(dtype);
 
@@ -328,7 +328,7 @@ void GlobalIndexHashMap::addPairs(std::vector<std::pair<std::pair<int,int>,int> 
   GA_Zero(g_offset);
 
   // Get offsets on remote processors
-  int r_offset[p_nprocs];
+  std::vector<int> r_offset(p_nprocs);
   for (j=0; j<p_nprocs; j++) {
     i = (j+p_me)%p_nprocs;
     if (ndest[i] > 0) {
@@ -339,12 +339,12 @@ void GlobalIndexHashMap::addPairs(std::vector<std::pair<std::pair<int,int>,int> 
   }
   GA_Pgroup_sync(p_GAgrp);
   // Copy values from global array to local array and evaluate global offsets
-  int numValues[p_nprocs];
+  std::vector<int> numValues(p_nprocs);
   int lo, hi;
   lo = 0;
   hi = p_nprocs-1;
   if (p_me == 0) {
-    NGA_Get(g_offset,&lo,&hi,numValues,&one);
+    NGA_Get(g_offset,&lo,&hi,&numValues[0],&one);
   } else {
     for (i=0; i<p_nprocs; i++) {
       numValues[i] = 0;
@@ -352,7 +352,7 @@ void GlobalIndexHashMap::addPairs(std::vector<std::pair<std::pair<int,int>,int> 
   }
   char plus[2];
   strcpy(plus,"+");
-  GA_Pgroup_igop(p_GAgrp, numValues, p_nprocs, plus);
+  GA_Pgroup_igop(p_GAgrp, &numValues[0], p_nprocs, plus);
   GA_Destroy(g_offset);
   int totalVals = 0;
   for (i=0; i<p_nprocs; i++) {
@@ -367,13 +367,13 @@ void GlobalIndexHashMap::addPairs(std::vector<std::pair<std::pair<int,int>,int> 
   dims = totalVals+1;
   GA_Set_data(g_data,one,&dims,dtype);
   GA_Set_pgroup(g_data,p_GAgrp);
-  int mapc[p_nprocs];
+  std::vector<int> mapc(p_nprocs);
   mapc[0] = 0;
   for (i=1; i<p_nprocs; i++) {
     mapc[i] = mapc[i-1] + numValues[i-1];
   }
   blocks = p_nprocs;
-  GA_Set_irreg_distr(g_data,mapc,&blocks);
+  GA_Set_irreg_distr(g_data,&mapc[0],&blocks);
   GA_Allocate(g_data);
   NGA_Deregister_type(dtype);
 
@@ -572,7 +572,7 @@ void GlobalIndexHashMap::getValues(std::vector<int> &keys, std::vector<int> &val
   GA_Zero(g_offset);
 
   // Get offsets on remote processors
-  int r_offset[p_nprocs];
+  std::vector<int> r_offset(p_nprocs);
   for (j=0; j<p_nprocs; j++) {
     i = (j+p_me)%p_nprocs;
     if (ndest[i] > 0) {
@@ -584,12 +584,12 @@ void GlobalIndexHashMap::getValues(std::vector<int> &keys, std::vector<int> &val
   }
   GA_Pgroup_sync(p_GAgrp);
   // Copy values from global array to local array and evaluate global offsets
-  int numValues[p_nprocs];
+  std::vector<int> numValues(p_nprocs);
   int lo, hi;
   lo = 0;
   hi = p_nprocs-1;
   if (p_me == 0) {
-    NGA_Get(g_offset,&lo,&hi,numValues,&one);
+    NGA_Get(g_offset,&lo,&hi,&numValues[0],&one);
   } else {
     for (i=0; i<p_nprocs; i++) {
       numValues[i] = 0;
@@ -597,7 +597,7 @@ void GlobalIndexHashMap::getValues(std::vector<int> &keys, std::vector<int> &val
   }
   char plus[2];
   strcpy(plus,"+");
-  GA_Pgroup_igop(p_GAgrp, numValues, p_nprocs, plus);
+  GA_Pgroup_igop(p_GAgrp, &numValues[0], p_nprocs, plus);
   int totalVals = 0;
   for (i=0; i<p_nprocs; i++) {
     r_offset[i] += totalVals;
@@ -610,13 +610,13 @@ void GlobalIndexHashMap::getValues(std::vector<int> &keys, std::vector<int> &val
   dims = totalVals+1;
   GA_Set_data(g_data,one,&dims,C_INT);
   GA_Set_pgroup(g_data,p_GAgrp);
-  int mapc[p_nprocs];
+  std::vector<int> mapc(p_nprocs);
   mapc[0] = 0;
   for (i=1; i<p_nprocs; i++) {
     mapc[i] = mapc[i-1] + 2*numValues[i-1];
   }
   blocks = p_nprocs;
-  GA_Set_irreg_distr(g_data,mapc,&blocks);
+  GA_Set_irreg_distr(g_data,&mapc[0],&blocks);
   GA_Allocate(g_data);
 
   // Repack keys and send them to the processor that owns the corresponding
@@ -671,7 +671,7 @@ void GlobalIndexHashMap::getValues(std::vector<int> &keys, std::vector<int> &val
 
   // Now need to repack data and send it back to requesting processor
   size = data_pairs.size()/3;
-  int lreturn[size];
+  std::vector<int> lreturn(size);
   // initialize all arrays
   for (i=0; i<p_nprocs; i++) {
     ndest[i] = 0;
@@ -707,13 +707,13 @@ void GlobalIndexHashMap::getValues(std::vector<int> &keys, std::vector<int> &val
   lo = 0;
   hi = p_nprocs-1;
   if (p_me == 0) {
-    NGA_Get(g_offset,&lo,&hi,numValues,&one);
+    NGA_Get(g_offset,&lo,&hi,&numValues[0],&one);
   } else {
     for (i=0; i<p_nprocs; i++) {
       numValues[i] = 0;
     }
   }
-  GA_Pgroup_igop(p_GAgrp, numValues, p_nprocs, plus);
+  GA_Pgroup_igop(p_GAgrp, &numValues[0], p_nprocs, plus);
   GA_Destroy(g_offset);
   totalVals = 0;
   for (i=0; i<p_nprocs; i++) {
@@ -731,7 +731,7 @@ void GlobalIndexHashMap::getValues(std::vector<int> &keys, std::vector<int> &val
     mapc[i] = mapc[i-1] + 2*numValues[i-1];
   }
   blocks = p_nprocs;
-  GA_Set_irreg_distr(g_data,mapc,&blocks);
+  GA_Set_irreg_distr(g_data,&mapc[0],&blocks);
   GA_Allocate(g_data);
 
   // Repack key-value pairs and send them to the processor that requested the
@@ -942,7 +942,7 @@ void GlobalIndexHashMap::getValues(std::vector<std::pair<int,int> > &keys,
   GA_Zero(g_offset);
 
   // Get offsets on remote processors
-  int r_offset[p_nprocs];
+  std::vector<int> r_offset(p_nprocs);
   for (j=0; j<p_nprocs; j++) {
     i = (j+p_me)%p_nprocs;
     if (ndest[i] > 0) {
@@ -954,12 +954,12 @@ void GlobalIndexHashMap::getValues(std::vector<std::pair<int,int> > &keys,
   }
   GA_Pgroup_sync(p_GAgrp);
   // Copy values from global array to local array and evaluate global offsets
-  int numValues[p_nprocs];
+  std::vector<int> numValues(p_nprocs);
   int lo, hi;
   lo = 0;
   hi = p_nprocs-1;
   if (p_me == 0) {
-    NGA_Get(g_offset,&lo,&hi,numValues,&one);
+    NGA_Get(g_offset,&lo,&hi,&numValues[0],&one);
   } else {
     for (i=0; i<p_nprocs; i++) {
       numValues[i] = 0;
@@ -967,7 +967,7 @@ void GlobalIndexHashMap::getValues(std::vector<std::pair<int,int> > &keys,
   }
   char plus[2];
   strcpy(plus,"+");
-  GA_Pgroup_igop(p_GAgrp, numValues, p_nprocs, plus);
+  GA_Pgroup_igop(p_GAgrp, &numValues[0], p_nprocs, plus);
   int totalVals = 0;
   for (i=0; i<p_nprocs; i++) {
     r_offset[i] += totalVals;
@@ -980,13 +980,13 @@ void GlobalIndexHashMap::getValues(std::vector<std::pair<int,int> > &keys,
   dims = totalVals+1;
   GA_Set_data(g_data,one,&dims,C_INT);
   GA_Set_pgroup(g_data,p_GAgrp);
-  int mapc[p_nprocs];
+  std::vector<int> mapc(p_nprocs);
   mapc[0] = 0;
   for (i=1; i<p_nprocs; i++) {
     mapc[i] = mapc[i-1] + 3*numValues[i-1];
   }
   blocks = p_nprocs;
-  GA_Set_irreg_distr(g_data,mapc,&blocks);
+  GA_Set_irreg_distr(g_data,&mapc[0],&blocks);
   GA_Allocate(g_data);
 
   // Repack keys and send them to the processor that owns the corresponding
@@ -1046,7 +1046,7 @@ void GlobalIndexHashMap::getValues(std::vector<std::pair<int,int> > &keys,
 
   // Now need to repack data and send it back to requesting processor
   size = data_pairs.size()/4;
-  int lreturn[size];
+  std::vector<int> lreturn(size);
   // initialize all arrays
   for (i=0; i<p_nprocs; i++) {
     ndest[i] = 0;
@@ -1082,13 +1082,13 @@ void GlobalIndexHashMap::getValues(std::vector<std::pair<int,int> > &keys,
   lo = 0;
   hi = p_nprocs-1;
   if (p_me == 0) {
-    NGA_Get(g_offset,&lo,&hi,numValues,&one);
+    NGA_Get(g_offset,&lo,&hi,&numValues[0],&one);
   } else {
     for (i=0; i<p_nprocs; i++) {
       numValues[i] = 0;
     }
   }
-  GA_Pgroup_igop(p_GAgrp, numValues, p_nprocs, plus);
+  GA_Pgroup_igop(p_GAgrp, &numValues[0], p_nprocs, plus);
   GA_Destroy(g_offset);
   totalVals = 0;
   for (i=0; i<p_nprocs; i++) {
@@ -1106,7 +1106,7 @@ void GlobalIndexHashMap::getValues(std::vector<std::pair<int,int> > &keys,
     mapc[i] = mapc[i-1] + 3*numValues[i-1];
   }
   blocks = p_nprocs;
-  GA_Set_irreg_distr(g_data,mapc,&blocks);
+  GA_Set_irreg_distr(g_data,&mapc[0],&blocks);
   GA_Allocate(g_data);
 
   // Repack key-value pairs and send them to the processor that requested the

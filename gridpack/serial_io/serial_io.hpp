@@ -7,7 +7,7 @@
 /**
  * @file   serial_io.hpp
  * @author Bruce Palmer
- * @date   2016-07-14 14:49:01 d3g096
+ * @date   2016-07-25 13:00:30 d3g096
  * 
  * @brief  
  * 
@@ -296,7 +296,7 @@ class SerialBusIO {
       index = new int*[nwrites];
       indexbuf = new int[nwrites];
       iptr = indexbuf;
-      int ones[nwrites];
+      std::vector<int> ones(nwrites);
       char *strbuf;
       if (nwrites*p_size > 0) strbuf = new char[nwrites*p_size];
       ptr = strbuf;
@@ -317,7 +317,7 @@ class SerialBusIO {
       // Scatter data to global buffer and set mask array
       if (ncnt > 0) {
         NGA_Scatter(p_stringGA,strbuf,index,nwrites);
-        NGA_Scatter(p_maskGA,ones,index,nwrites);
+        NGA_Scatter(p_maskGA,&ones[0],index,nwrites);
       }
       if (nwrites*p_size > 0) delete [] strbuf;
       delete [] index;
@@ -335,8 +335,8 @@ class SerialBusIO {
         NGA_Distribution(p_maskGA, i, &lo, &hi);
         int ld = hi - lo + 1;
         // Figure out how many strings are coming from process i
-        int imask[ld];
-        NGA_Get(p_maskGA,&lo,&hi,imask,&one);
+        std::vector<int> imask(ld);
+        NGA_Get(p_maskGA,&lo,&hi,&imask[0],&one);
         int j;
         nwrites = 0;
         for (j=0; j<ld; j++) {
@@ -346,7 +346,7 @@ class SerialBusIO {
         }
         // Create buffers to retrieve strings from process i
         if (nwrites > 0) {
-          char iobuf[p_size*nwrites];
+          std::vector<char> iobuf(p_size*nwrites);
           index = new int*[nwrites];
           indexbuf = new int[nwrites];
           iptr = indexbuf;
@@ -359,8 +359,8 @@ class SerialBusIO {
               iptr++;
             }
           }
-          NGA_Gather(p_stringGA,iobuf,index,nwrites);
-          ptr = iobuf;
+          NGA_Gather(p_stringGA,&iobuf[0],index,nwrites);
+          ptr = &iobuf[0];
           nwrites = 0;
           for (j=0; j<ld; j++) {
             if (imask[j] == 1) {
@@ -405,7 +405,7 @@ class SerialBusIO {
   void write(std::ostream & out, const char *signal = NULL)
   {
     int nBus = p_network->numBuses();
-    char string[p_size];
+    std::vector<char> string(p_size);
     int nwrites = 0;
     int i;
     int one = 1;
@@ -414,7 +414,7 @@ class SerialBusIO {
     // Count up total strings being written from this processor
     for (i=0; i<nBus; i++) {
       if (p_network->getActiveBus(i) &&
-          p_network->getBus(i)->serialWrite(string,p_size,signal)) {
+          p_network->getBus(i)->serialWrite(&string[0],p_size,signal)) {
         nwrites++;
       }
     }
@@ -429,7 +429,7 @@ class SerialBusIO {
       index = new int*[nwrites];
       indexbuf = new int[nwrites];
       iptr = indexbuf;
-      int ones[nwrites];
+      std::vector<int> ones(nwrites);
       char *strbuf;
       if (nwrites*p_size > 0) strbuf = new char[nwrites*p_size];
       ptr = strbuf;
@@ -450,7 +450,7 @@ class SerialBusIO {
       // Scatter data to global buffer and set mask array
       if (ncnt > 0) {
         NGA_Scatter(p_stringGA,strbuf,index,nwrites);
-        NGA_Scatter(p_maskGA,ones,index,nwrites);
+        NGA_Scatter(p_maskGA,&ones[0],index,nwrites);
       }
       if (nwrites*p_size > 0) delete [] strbuf;
       delete [] index;
@@ -467,8 +467,8 @@ class SerialBusIO {
         NGA_Distribution(p_maskGA, i, &lo, &hi);
         int ld = hi - lo + 1;
         // Figure out how many strings are coming from process i
-        int imask[ld];
-        NGA_Get(p_maskGA,&lo,&hi,imask,&one);
+	std::vector<int> imask(ld);
+        NGA_Get(p_maskGA,&lo,&hi,&imask[0],&one);
         int j;
         nwrites = 0;
         for (j=0; j<ld; j++) {
@@ -478,7 +478,7 @@ class SerialBusIO {
         }
         // Create buffers to retrieve strings from process i
         if (nwrites > 0) {
-          char iobuf[p_size*nwrites];
+	  std::vector<char> iobuf(p_size*nwrites);
           index = new int*[nwrites];
           indexbuf = new int[nwrites];
           iptr = indexbuf;
@@ -491,8 +491,8 @@ class SerialBusIO {
               iptr++;
             }
           }
-          NGA_Gather(p_stringGA,iobuf,index,nwrites);
-          ptr = iobuf;
+          NGA_Gather(p_stringGA,&iobuf[0],index,nwrites);
+          ptr = &iobuf[0];
           nwrites = 0;
           for (j=0; j<ld; j++) {
             if (imask[j] == 1) {
@@ -689,7 +689,7 @@ class SerialBranchIO {
     if (sizeof(_data_type) > p_size) {
       char buf[256];
       sprintf(buf,"SerialBranchIO::gatherData: data_type size inconsistent"
-          " with allocated size: data: %d allocated: %ld\n",
+          " with allocated size: data: %lu allocated: %d\n",
           sizeof(_data_type),p_size);
       printf(buf);
       throw gridpack::Exception(buf);
@@ -718,7 +718,7 @@ class SerialBranchIO {
       index = new int*[nwrites];
       indexbuf = new int[nwrites];
       iptr = indexbuf;
-      int ones[nwrites];
+      std::vector<int> ones(nwrites);
       char *strbuf;
       if (nwrites*p_size > 0) strbuf = new char[nwrites*p_size];
       ptr = strbuf;
@@ -739,7 +739,7 @@ class SerialBranchIO {
       // Scatter data to global buffer and set mask array
       if (ncnt > 0) {
         NGA_Scatter(p_stringGA,strbuf,index,nwrites);
-        NGA_Scatter(p_maskGA,ones,index,nwrites);
+        NGA_Scatter(p_maskGA,&ones[0],index,nwrites);
       }
       if (nwrites*p_size > 0) delete [] strbuf;
       delete [] index;
@@ -757,8 +757,8 @@ class SerialBranchIO {
         NGA_Distribution(p_maskGA, i, &lo, &hi);
         int ld = hi - lo + 1;
         // Figure out how many strings are coming from process i
-        int imask[ld];
-        NGA_Get(p_maskGA,&lo,&hi,imask,&one);
+        std::vector<int> imask(ld);
+        NGA_Get(p_maskGA,&lo,&hi,&imask[0],&one);
         int j;
         nwrites = 0;
         for (j=0; j<ld; j++) {
@@ -768,7 +768,7 @@ class SerialBranchIO {
         }
         // Create buffers to retrieve strings from process i
         if (nwrites > 0) {
-          char iobuf[p_size*nwrites];
+	  std::vector<char> iobuf(p_size*nwrites);
           index = new int*[nwrites];
           indexbuf = new int[nwrites];
           iptr = indexbuf;
@@ -781,8 +781,8 @@ class SerialBranchIO {
               iptr++;
             }
           }
-          NGA_Gather(p_stringGA,iobuf,index,nwrites);
-          ptr = iobuf;
+          NGA_Gather(p_stringGA,&iobuf[0],index,nwrites);
+          ptr = &iobuf[0];
           nwrites = 0;
           for (j=0; j<ld; j++) {
             if (imask[j] == 1) {
@@ -810,7 +810,7 @@ class SerialBranchIO {
   void write(std::ostream & out, const char *signal = NULL)
   {
     int nBranch = p_network->numBranches();
-    char string[p_size];
+    std::vector<char> string(p_size);
     int nwrites = 0;
     int i;
     int one = 1;
@@ -819,7 +819,7 @@ class SerialBranchIO {
     // Count up total strings being written from this processor
     for (i=0; i<nBranch; i++) {
       if (p_network->getActiveBranch(i) &&
-          p_network->getBranch(i)->serialWrite(string,p_size,signal)) nwrites++;
+          p_network->getBranch(i)->serialWrite(&string[0],p_size,signal)) nwrites++;
     }
 
     // Set up buffers to scatter strings to global buffer
@@ -832,7 +832,7 @@ class SerialBranchIO {
       index = new int*[nwrites];
       indexbuf = new int[nwrites];
       iptr = indexbuf;
-      int ones[nwrites];
+      std::vector<int> ones(nwrites);
       char *strbuf;
       if (nwrites*p_size > 0) strbuf = new char[nwrites*p_size];
       ptr = strbuf;
@@ -853,7 +853,7 @@ class SerialBranchIO {
       // Scatter data to global buffer and set mask array
       if (ncnt > 0) {
         NGA_Scatter(p_stringGA,strbuf,index,nwrites);
-        NGA_Scatter(p_maskGA,ones,index,nwrites);
+        NGA_Scatter(p_maskGA,&ones[0],index,nwrites);
       }
       if (nwrites*p_size > 0) delete [] strbuf;
       delete [] index;
@@ -870,8 +870,8 @@ class SerialBranchIO {
         NGA_Distribution(p_maskGA, i, &lo, &hi);
         int ld = hi - lo + 1;
         // Figure out how many strings are coming from process i
-        int imask[ld];
-        NGA_Get(p_maskGA,&lo,&hi,imask,&one);
+        std::vector<int> imask(ld);
+        NGA_Get(p_maskGA,&lo,&hi,&imask[0],&one);
         int j;
         nwrites = 0;
         for (j=0; j<ld; j++) {
@@ -881,7 +881,7 @@ class SerialBranchIO {
         }
         // Create buffers to retrieve strings from process i
         if (nwrites > 0) {
-          char iobuf[p_size*nwrites];
+          std::vector<char> iobuf(p_size*nwrites);
           index = new int*[nwrites];
           indexbuf = new int[nwrites];
           iptr = indexbuf;
@@ -894,8 +894,8 @@ class SerialBranchIO {
               iptr++;
             }
           }
-          NGA_Gather(p_stringGA,iobuf,index,nwrites);
-          ptr = iobuf;
+          NGA_Gather(p_stringGA,&iobuf[0],index,nwrites);
+          ptr = &iobuf[0];
           nwrites = 0;
           for (j=0; j<ld; j++) {
             if (imask[j] == 1) {
