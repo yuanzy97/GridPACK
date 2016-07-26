@@ -250,6 +250,9 @@ endif()
 # disable the annoying max/min macros in Windoze
 if (WIN32)
    add_definitions(/D NOMINMAX)
+   if (MSVC)
+      add_definitions(/D _CRT_SECURE_NO_WARNINGS /wd4267)
+   endif(MSVC)
 endif (WIN32)
 
 set(GRIDPACK_SRC_DIR ${CMAKE_CURRENT_SOURCE_DIR})

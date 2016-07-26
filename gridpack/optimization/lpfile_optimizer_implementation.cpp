@@ -17,6 +17,7 @@
  */
 // -------------------------------------------------------------
 
+#include <cctype>
 #include <iostream>
 #include <fstream>
 #include <algorithm>
@@ -50,7 +51,7 @@ public:
     if (do_new_line_) {
       if (c == '\n') {
         do_new_line_ = false;
-      } else if (!std::isspace(c)) {
+      } else if (!::isspace(c)) {
         if (!put_char(dest, '\n')) return false;
         do_new_line_ = false;
       } else {
@@ -59,7 +60,7 @@ public:
       }
     } else if (col_no_ >= (line_length_ - end_margin_)) {
       // wait until we see some white space before doing a new line
-      if (std::isspace(c)) {
+      if (::isspace(c)) {
         do_new_line_ = true;
       }
     }
