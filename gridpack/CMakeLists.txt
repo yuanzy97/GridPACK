@@ -10,7 +10,7 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created May  3, 2013 by William A. Perkins
-# Last Change: 2016-07-15 10:33:07 d3g096
+# Last Change: 2016-07-25 13:27:45 d3g096
 # -------------------------------------------------------------
 
 cmake_minimum_required (VERSION 2.8.8)
@@ -244,9 +244,6 @@ if (CMAKE_COMPILER_IS_GNUCXX)
       -Wno-write-strings
       -Wno-long-long 
       -Wno-sign-compare 
-      -Wno-unused-variable
-      -Wno-unused-but-set-variable
-      -Wno-maybe-uninitialized
     )
 endif()
 
