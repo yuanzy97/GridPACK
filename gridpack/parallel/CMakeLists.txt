@@ -10,7 +10,7 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created May  6, 2013 by William A. Perkins
-# Last Change: 2016-07-15 10:31:43 d3g096
+# Last Change: 2016-09-15 08:55:59 d3g096
 # -------------------------------------------------------------
 
 add_library(gridpack_parallel 
@@ -87,11 +87,14 @@ if (GA_FOUND)
   # TEST: task_test
   # A simple program to test the task manager
   # -------------------------------------------------------------
-  add_executable(task_test test/task_test.cpp)
+  add_executable(task_test 
+    test/task_test.cpp 
+    ../../timer/local_timer.cpp
+  )
   target_link_libraries(task_test 
     gridpack_parallel 
     ${target_libraries}
-    )
+  )
   gridpack_add_run_test(task_test task_test "")
 endif(GA_FOUND)
 
