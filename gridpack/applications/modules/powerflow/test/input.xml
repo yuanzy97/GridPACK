@@ -16,7 +16,6 @@
       </PETScOptions>
     </LinearSolver> 
     -->
-    <!--
     <LinearSolver>
       <SolutionTolerance>1.0E-15</SolutionTolerance>
       <MaxIterations>10000</MaxIterations>
@@ -29,7 +28,7 @@
         -ksp_view
       </PETScOptions>
     </LinearSolver>
-    -->
+    <!--
     <LinearSolver>
       <PETScOptions>
         -ksp_view
@@ -39,6 +38,7 @@
         -ksp_max_it 1
       </PETScOptions>
     </LinearSolver>
+    -->
     <!--
     <LinearSolver>
       <PETScOptions>

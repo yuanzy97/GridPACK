@@ -62,3 +62,8 @@ add_custom_target(ds_implicit.x.input
 )
 
 add_dependencies(ds_implicit.x ds_implicit.x.input)
+
+# -------------------------------------------------------------
+# run application as test
+# -------------------------------------------------------------
+gridpack_add_run_test("dynamic_simulation_implicit" ds_implicit.x input.xml)

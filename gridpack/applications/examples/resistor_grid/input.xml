@@ -2,6 +2,17 @@
 <Configuration>
   <ResistorGrid>
     <networkConfiguration> small.raw </networkConfiguration>
+    <LinearSolver>
+      <SolutionTolerance>1.0E-15</SolutionTolerance>
+      <MaxIterations>10000</MaxIterations>
+      <PETScOptions>
+        -ksp_type bicg
+        -pc_type bjacobi
+        -sub_pc_type ilu -sub_pc_factor_levels 5 -sub_ksp_type preonly 
+        -ksp_monitor
+        -ksp_view
+      </PETScOptions>
+    </LinearSolver>
     <!--
     <LinearSolver>
       <PETScPrefix>nrs</PETScPrefix>

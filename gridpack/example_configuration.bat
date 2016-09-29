@@ -18,7 +18,7 @@ cmake -Wdev --debug-trycompile ^
     -D GA_TEST_RUNS:BOOL=YES ^
     -D PARMETIS_DIR:PATH=C:\GridPACK ^
     -D MPIEXEC_MAX_NUMPROCS:STRING="2" ^
-    -D GRIDPACK_TEST_TIMEOUT:STRING=10 ^
+    -D GRIDPACK_TEST_TIMEOUT:STRING=60 ^
     ..
 
   
