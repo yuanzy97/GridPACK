@@ -10,7 +10,7 @@
 /**
  * @file   variable.hpp
  * @author William A. Perkins
- * @date   2016-11-11 11:25:18 d3g096
+ * @date   2016-11-11 11:20:15 d3g096
  * 
  * @brief  
  * 

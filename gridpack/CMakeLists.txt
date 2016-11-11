@@ -10,10 +10,17 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created May  3, 2013 by William A. Perkins
-# Last Change: 2016-07-25 13:27:45 d3g096
+# Last Change: 2016-11-11 12:28:06 d3g096
 # -------------------------------------------------------------
 
 cmake_minimum_required (VERSION 2.8.8)
+
+# This allows the use of LOCATION(target)
+if (POLICY CMP0026)
+  cmake_policy(SET CMP0026 OLD)
+endif (POLICY CMP0026)
+
+
 project (GridPACK)
 
 #set (GridPACK_VERSION_MAJOR 1)
@@ -268,12 +275,20 @@ endif()
 
 # -------------------------------------------------------------
 # Subdirectories
+#
+#  ****NOTE****
+#  For any subdirectory that contributes a LIBRARY to the
+#  GridPACK framework, modifications also need to be made to
+#  the src/lib/GridPACK/cmake.in file so that installs will
+#  work correctly
+#
 # -------------------------------------------------------------
 add_subdirectory(parallel)
 add_subdirectory(utilities)
 add_subdirectory(configuration)
 add_subdirectory(timer)
 add_subdirectory(math)
+add_subdirectory(expression)
 
 # These sub directories really cannot be built without GA
 if (GA_FOUND)

@@ -9,7 +9,7 @@
 /**
  * @file   variable.cpp
  * @author William A. Perkins
- * @date   2016-11-11 12:27:02 d3g096
+ * @date   2016-11-11 11:20:26 d3g096
  * 
  * @brief  
  * 

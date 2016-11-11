@@ -7,7 +7,7 @@
 # distribution.
 # -------------------------------------------------------------
 # Created May  7, 2013 by William A. Perkins
-# Last Change: 2016-07-01 11:37:32 d3g096
+# Last Change: 2016-11-11 12:25:57 d3g096
 # -------------------------------------------------------------
 set(gridpack_math_sources)
 
@@ -138,6 +138,7 @@ endif()
 add_library(gridpack_math
   ${gridpack_math_sources}
 )
+target_link_libraries(gridpack_math ${target_libraries})
 
 # -------------------------------------------------------------
 # a small test (not a unit test)

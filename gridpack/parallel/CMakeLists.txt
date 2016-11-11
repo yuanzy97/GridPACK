@@ -10,7 +10,7 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created May  6, 2013 by William A. Perkins
-# Last Change: 2016-09-15 08:55:59 d3g096
+# Last Change: 2016-11-11 11:25:03 d3g096
 # -------------------------------------------------------------
 
 add_library(gridpack_parallel 
@@ -21,6 +21,12 @@ add_library(gridpack_parallel
   random.cpp
 )
 
+target_link_libraries(gridpack_parallel
+  ${Boost_LIBRARIES} 
+  ${GA_LIBRARIES} 
+  ${MPI_CXX_LIBRARIES}
+)
+  
 include_directories(BEFORE ${CMAKE_CURRENT_SOURCE_DIR})
 set(target_libraries
   ${Boost_LIBRARIES} ${MPI_CXX_LIBRARIES}

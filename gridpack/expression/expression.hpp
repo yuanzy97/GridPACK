@@ -10,7 +10,7 @@
 /**
  * @file   expression.hpp
  * @author William A. Perkins
- * @date   2016-11-11 12:26:18 d3g096
+ * @date   2016-11-11 11:24:16 d3g096
  * 
  * @brief  
  * 
@@ -24,11 +24,13 @@
 #include <iostream>
 #include <boost/shared_ptr.hpp>
 #include <boost/format.hpp>
+#include <boost/static_assert.hpp>
+#include <boost/type_traits/is_same.hpp>
 #include <boost/serialization/base_object.hpp>
 
 #include <boost/serialization/export.hpp>
 
-#include <gridpack/optimization/variable.hpp>
+#include <gridpack/expression/variable.hpp>
 
 namespace gridpack {
 namespace optimization {
@@ -58,6 +60,8 @@ class LessThanOrEqual;
 class GreaterThan;
 class GreaterThanOrEqual;
 class Equal;
+
+class Function;
 
 // -------------------------------------------------------------
 //  class ExpressionVisitor
@@ -96,6 +100,8 @@ public:
   virtual void visit(GreaterThanOrEqual& e);
   virtual void visit(Equal& e);
 
+  virtual void visit(Function& e);
+
 };
 
 // -------------------------------------------------------------
@@ -121,6 +127,12 @@ public:
   int precedence(void) const
   {
     return p_precedence;
+  }
+
+  /// Is this expression empty?
+  virtual bool null(void) const
+  {
+    return this->p_null();
   }
 
   /// Do whatever 
@@ -151,6 +163,12 @@ protected:
 
   virtual void p_accept(ExpressionVisitor& e) = 0;
 
+  /// Is this expression empty?
+  virtual bool p_null(void) const
+  {
+    return true;
+  }
+
   /// Constructor for serialization
   Expression(void) : p_precedence() {}
 
@@ -174,6 +192,12 @@ template <typename T>
 class ConstantExpression 
   : public Expression
 {
+private:
+
+  /// Test for correct types
+  BOOST_STATIC_ASSERT(boost::is_same<T, double>::value ||
+                      boost::is_same<T, int>::value);
+
 public:
 
   /// Default constructor.
@@ -205,6 +229,11 @@ protected:
   void p_accept(ExpressionVisitor& e)
   {
     e.visit(*this);
+  }
+
+  bool p_null(void) const
+  {
+    return false;
   }
 
   /// Constructor for serialization
@@ -279,6 +308,11 @@ protected:
     e.visit(*this);
   }
 
+  bool p_null(void) const
+  {
+    return !static_cast<bool>(p_var);
+  }
+
   /// Constructor for serialization
   VariableExpression(void) 
     : Expression(), p_var() 
@@ -342,6 +376,14 @@ protected:
   void p_accept(ExpressionVisitor& e)
   {
     e.visit(*this);
+  }
+
+  bool p_null(void) const
+  {
+    bool result(true);
+    if (p_expr) 
+      result = p_operator.size() == 0 || p_expr->null();
+    return result;
   }
 
   /// Constructor for serialization
@@ -532,6 +574,17 @@ protected:
       s += "(empty)";
     }
     return s;
+  }
+
+  bool p_null(void) const
+  {
+    bool result(true);
+    if (p_LHS && p_RHS) {
+      result = p_operator.size() == 0 || 
+        p_LHS->null() ||
+        p_RHS->null();
+    }
+    return result;
   }
 
   void p_accept(ExpressionVisitor& e)
@@ -892,6 +945,22 @@ ExpressionPtr operator+(ExpressionPtr lhs, T rhs)
   return lhs + c;
 }
 
+template <typename T>
+ExpressionPtr operator+(T lhs, VariablePtr rhs)
+{
+  ExpressionPtr v(new VariableExpression(rhs));
+  ExpressionPtr c(new ConstantExpression<T>(lhs));
+  return c + v;
+}
+
+template <typename T>
+ExpressionPtr operator+(VariablePtr lhs, T rhs)
+{
+  ExpressionPtr v(new VariableExpression(lhs));
+  ExpressionPtr c(new ConstantExpression<T>(rhs));
+  return v + c;
+}
+
 inline
 ExpressionPtr operator+(VariablePtr lhs, ExpressionPtr rhs)
 {
@@ -949,6 +1018,22 @@ ExpressionPtr operator-(ExpressionPtr lhs, T rhs)
 {
   ExpressionPtr c(new ConstantExpression<T>(rhs));
   return lhs - c;
+}
+
+template <typename T>
+ExpressionPtr operator-(T lhs, VariablePtr rhs)
+{
+  ExpressionPtr v(new VariableExpression(rhs));
+  ExpressionPtr c(new ConstantExpression<T>(lhs));
+  return c - v;
+}
+
+template <typename T>
+ExpressionPtr operator-(VariablePtr lhs, T rhs)
+{
+  ExpressionPtr v(new VariableExpression(lhs));
+  ExpressionPtr c(new ConstantExpression<T>(rhs));
+  return v - c;
 }
 
 inline
