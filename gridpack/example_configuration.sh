@@ -212,7 +212,7 @@ elif [ $host == "WE32673" ]; then
         -D GA_DIR:STRING="$prefix" \
         -D BOOST_ROOT:STRING="/opt/local" \
         -D PETSC_DIR:STRING="$prefix/petsc-3.7.4" \
-        -D PETSC_ARCH:STRING="arch-macosx-clang-complex-opt" \
+        -D PETSC_ARCH:STRING="arch-macosx-clang-real-opt" \
         -D MPI_CXX_COMPILER:STRING='/opt/local/bin/mpicxx' \
         -D MPI_C_COMPILER:STRING='/opt/local/bin/mpicc' \
         -D MPIEXEC:STRING='/opt/local/bin/mpiexec' \
