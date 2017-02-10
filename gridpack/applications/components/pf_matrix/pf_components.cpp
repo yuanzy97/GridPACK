@@ -410,7 +410,7 @@ void gridpack::powerflow::PFBus::load(
         p_pt.push_back(pt);
         p_pb.push_back(pb);
         if (gstatus == 1) {
-          p_v = vs; //reset initial PV voltage to set voltage
+//          p_v = vs; //reset initial PV voltage to set voltage
           if (p_type == 2) p_isPV = true;
         }
         std::string id("-1");
@@ -616,13 +616,13 @@ void gridpack::powerflow::PFBus::setSBus(void)
       usegen = true;
     }
   }
-  printf ("size of load = %d \n", p_lstatus.size());
+  //printf ("size of load = %d \n", p_lstatus.size());
   for (i=0; i<p_lstatus.size(); i++) {
-    printf ("p_lstatus = %d \n", p_lstatus[i]);
+    //printf ("p_lstatus = %d \n", p_lstatus[i]);
     if (p_lstatus[i] == 1) {
       pl += p_pl[i];
       ql += p_ql[i];
-      printf ("%d: pl = %f \n", i,pl);
+      //printf ("%d: pl = %f \n", i,pl);
     }
   }
   if (p_gstatus.size() > 0 && usegen) {

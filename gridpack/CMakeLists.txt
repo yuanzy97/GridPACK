@@ -10,7 +10,7 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created May  3, 2013 by William A. Perkins
-# Last Change: 2016-11-11 12:28:06 d3g096
+# Last Change: 2017-02-10 12:19:26 d3g096
 # -------------------------------------------------------------
 
 cmake_minimum_required (VERSION 2.8.8)
@@ -74,7 +74,7 @@ option(USE_GLPK
 # -------------------------------------------------------------
 message(STATUS "Checking MPI ...")
 find_package (MPI REQUIRED)
-include_directories(AFTER ${MPI_INCLUDE_PATH})
+include_directories(AFTER ${MPI_CXX_INCLUDE_PATH})
 
 if (ENABLE_CRAY_BUILD)
   set (CMAKE_FIND_LIBRARY_SUFFIXES ".a")
@@ -240,17 +240,32 @@ if(DOXYGEN_FOUND)
 endif(DOXYGEN_FOUND)
 
 # -------------------------------------------------------------
-# Options for all Programs/Libraries
+# Compiler specific options
 # -------------------------------------------------------------
 
-# remove annoying warnings produced by the GNU compiler about the use
-# of string constants, which are used a lot in GridPACK
+# FIXME: remove annoying warnings (these warnings probably identify
+# real problems, but there are so many of them they obscure errors
+# that are causing identifiable problems
+
 if (CMAKE_COMPILER_IS_GNUCXX) 
-    add_definitions(
-      -pedantic
-      -Wno-write-strings
-      -Wno-long-long 
-      -Wno-sign-compare 
+  add_definitions(
+    -pedantic
+    -Wno-write-strings
+    -Wno-long-long 
+    -Wno-sign-compare 
+    -Wno-unused-variable
+    -Wno-unused-but-set-variable
+    -Wno-maybe-uninitialized
+    )
+endif()
+
+# using regular Clang or AppleClang
+if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+  add_definitions(
+    -Wno-c++11-extensions
+    -Wno-c++11-compat-deprecated-writable-strings
+    -Wno-format-security
+    -DGRIDPACK_AVOID_APPLECLANG_MPI_PROBLEMS=1
     )
 endif()
 
@@ -261,6 +276,10 @@ if (WIN32)
       add_definitions(/D _CRT_SECURE_NO_WARNINGS /wd4267)
    endif(MSVC)
 endif (WIN32)
+
+# -------------------------------------------------------------
+# Options for all Programs/Libraries
+# -------------------------------------------------------------
 
 set(GRIDPACK_SRC_DIR ${CMAKE_CURRENT_SOURCE_DIR})
 

@@ -10,7 +10,7 @@
 /**
  * @file   variable.hpp
  * @author William A. Perkins
- * @date   2016-11-11 11:20:15 d3g096
+ * @date   2017-02-10 12:20:22 d3g096
  * 
  * @brief  
  * 
@@ -25,11 +25,9 @@
 #include <iosfwd>
 #include <boost/shared_ptr.hpp>
 #include <boost/serialization/base_object.hpp>
-#include <gridpack/utilities/named.hpp>
+#include <boost/serialization/shared_ptr.hpp>
 #include <gridpack/utilities/uncopyable.hpp>
-
-#include <boost/serialization/export.hpp>
-
+#include <gridpack/utilities/named.hpp>
 
 namespace gridpack {
 namespace optimization {
@@ -123,7 +121,7 @@ private:
   template<class Archive> 
   void serialize(Archive &ar, const unsigned int)
   {
-    ar  & boost::serialization::base_object<utility::Named>(*this);
+    ar & boost::serialization::base_object<utility::Named>(*this);
     ar & p_id;
   }
 
