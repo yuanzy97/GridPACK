@@ -21,6 +21,7 @@
 // Last Change: 2013-05-03 12:23:12 d3g096
 // -------------------------------------------------------------
 
+#include <string>
 #include <iostream>
 #include <fstream>
 #include <boost/filesystem.hpp>
@@ -77,7 +78,7 @@ FileOptimizerImplementation::p_temporaryFileName(void)
 
   boost::system::error_code ec;
   file_status istat = status(tmp);
-  std::string result(tmp.c_str());
+  std::string result(tmp.string<std::string>());
   return result;
   
 }
