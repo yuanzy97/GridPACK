@@ -243,18 +243,18 @@ public:
     values.clear();
     //construct array of indices to retrieve data
     int nsize = p_local_idx.size();
-    double v[nsize];
-    int array[nsize];
+    std::vector<double> v(nsize);
+    std::vector<int> array(nsize);
     int **subscript;
     subscript = new int*[nsize];
-    int *ptr = array;
+    int *ptr = &array[0];
     int i;
     for (i=0; i<nsize; i++) {
       array[i] = p_nobjs*idx + p_order[i];
       subscript[i] = ptr;
       ptr++;
     }
-    NGA_Gather(p_GA_data, v, subscript, nsize);
+    NGA_Gather(p_GA_data, &v[0], subscript, nsize);
     delete [] subscript;
     GA_Sync();
     for (i=0; i<nsize; i++) {
