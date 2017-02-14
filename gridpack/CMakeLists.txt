@@ -10,7 +10,7 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created May  3, 2013 by William A. Perkins
-# Last Change: 2017-02-10 12:19:26 d3g096
+# Last Change: 2017-02-14 11:03:28 d3g096
 # -------------------------------------------------------------
 
 cmake_minimum_required (VERSION 2.8.8)
@@ -256,15 +256,18 @@ if (CMAKE_COMPILER_IS_GNUCXX)
     -Wno-unused-variable
     -Wno-unused-but-set-variable
     -Wno-maybe-uninitialized
+    -Werror=vla
     )
 endif()
 
 # using regular Clang or AppleClang
 if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   add_definitions(
+    -pedantic
     -Wno-c++11-extensions
     -Wno-c++11-compat-deprecated-writable-strings
     -Wno-format-security
+    -Werror=vla
     -DGRIDPACK_AVOID_APPLECLANG_MPI_PROBLEMS=1
     )
 endif()
