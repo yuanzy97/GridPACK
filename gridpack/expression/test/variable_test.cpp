@@ -9,7 +9,7 @@
 /**
  * @file   variable_test.cpp
  * @author William A. Perkins
- * @date   2016-11-11 11:20:39 d3g096
+ * @date   2017-02-10 12:19:56 d3g096
  * 
  * @brief  
  * 
@@ -173,6 +173,7 @@ BOOST_AUTO_TEST_CASE( MPIserialization )
     vlist0.push_back(go::VariablePtr(new go::IntegerVariable(0, -1, 1)));
     vlist0.push_back(go::VariablePtr(new go::BinaryVariable(1)));
   } 
+
   boost::mpi::broadcast(world, vlist0, 0);
 
   go::VariableCounter cnt;
@@ -196,7 +197,6 @@ BOOST_AUTO_TEST_CASE( MPIserialization )
   }
 }
 
-
 BOOST_AUTO_TEST_SUITE_END()
 
 // -------------------------------------------------------------
@@ -214,6 +214,19 @@ int
 main(int argc, char **argv)
 {
   gridpack::parallel::Environment env(argc, argv);
-  int result = ::boost::unit_test::unit_test_main( &init_function, argc, argv );
-  return result;
+  gridpack::parallel::Communicator world;
+  int lresult = ::boost::unit_test::unit_test_main( &init_function, argc, argv );
+  lresult = (lresult == boost::exit_success ? 0 : 1);
+
+  int gresult;
+  boost::mpi::all_reduce(world, lresult, gresult, std::plus<int>());
+  if (world.rank() == 0) {
+    if (gresult == 0) {
+      std::cout << "No errors detected" << std::endl;
+    } else {
+      std::cout << "failure detected" << std::endl;
+    }
+  }
+
+  return gresult;
 }

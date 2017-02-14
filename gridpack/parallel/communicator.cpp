@@ -9,7 +9,7 @@
 /**
  * @file   communicator.cpp
  * @author William A. Perkins
- * @date   2016-07-01 10:25:48 d3g096
+ * @date   2017-02-10 12:20:47 d3g096
  * 
  * @brief  
  * 
@@ -135,7 +135,7 @@ public:
     gaSrc[me] = GA_Nodeid();
     boost::mpi::all_reduce(comm, &gaSrc[0], nprocs, &gaDest[0], std::plus<int>());
     p_handle = GA_Pgroup_create(&gaDest[0],nprocs);
-    GA_Pgroup_sync(p_handle);
+    // GA_Pgroup_sync(p_handle);
     GA_Pgroup_set_default(defGrp);
   }
 
