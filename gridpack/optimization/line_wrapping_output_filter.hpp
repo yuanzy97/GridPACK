@@ -27,6 +27,7 @@
 #ifndef _line_wrapping_output_filter_hpp_
 #define _line_wrapping_output_filter_hpp_
 
+#include <cctype>
 #include <boost/iostreams/filtering_stream.hpp>
 
 namespace io = boost::iostreams;
