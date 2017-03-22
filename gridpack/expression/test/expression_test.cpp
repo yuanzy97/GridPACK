@@ -9,7 +9,7 @@
 /**
  * @file   expression_test.cpp
  * @author William A. Perkins
- * @date   2017-02-10 12:19:44 d3g096
+ * @date   2017-03-22 10:41:18 d3g096
  * 
  * @brief  
  * 
@@ -205,6 +205,8 @@ BOOST_AUTO_TEST_CASE(function_test)
   f = go::cos(x + A);
   f->evaluate();
   f = go::sin(A + x);
+  f->evaluate();
+  f = go::sin(A);
   f->evaluate();
 }
 

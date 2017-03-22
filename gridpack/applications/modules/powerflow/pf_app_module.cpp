@@ -84,15 +84,23 @@ void gridpack::powerflow::PFAppModule::readNetwork(
   p_tolerance = cursor->get("tolerance",1.0e-6);
   p_max_iteration = cursor->get("maxIteration",50);
   ComplexType tol;
+  // Phase shift sign
+  double phaseShiftSign = cursor->get("phaseShiftSign",1.0);
 
   int t_pti = timer->createCategory("Powerflow: Network Parser");
   timer->start(t_pti);
   if (filetype == PTI23) {
     gridpack::parser::PTI23_parser<PFNetwork> parser(network);
     parser.parse(filename.c_str());
+    if (phaseShiftSign == -1.0) {
+      parser.changePhaseShiftSign();
+    }
   } else if (filetype == PTI33) {
     gridpack::parser::PTI33_parser<PFNetwork> parser(network);
     parser.parse(filename.c_str());
+    if (phaseShiftSign == -1.0) {
+      parser.changePhaseShiftSign();
+    }
   } else if (filetype == GOSS) {
     gridpack::parser::GOSS_parser<PFNetwork> parser(network);
     parser.parse(filename.c_str());
@@ -432,6 +440,9 @@ void gridpack::powerflow::PFAppModule::write()
   p_branchIO->write();
 
 
+  p_busIO->header("\n   Generator Power\n");
+  p_busIO->header("\n   Bus Number  GenID        Pgen              Qgen\n");
+  p_busIO->write("power");
   p_busIO->header("\n   Bus Voltages and Phase Angles\n");
   p_busIO->header("\n   Bus Number      Phase Angle      Voltage Magnitude\n");
   p_busIO->write();
@@ -465,6 +476,11 @@ void gridpack::powerflow::PFAppModule::writeBranch(const char *signal)
   p_branchIO->write(signal);
   timer->stop(t_write);
   timer->stop(t_total);
+}
+
+void gridpack::powerflow::PFAppModule::writeHeader(const char *msg)
+{
+  p_busIO->header(msg);
 }
 
 /**
