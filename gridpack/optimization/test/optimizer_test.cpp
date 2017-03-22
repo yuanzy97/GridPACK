@@ -33,6 +33,11 @@ namespace gp = gridpack::parallel;
 /// The configuration used for these tests
 static gridpack::utility::Configuration::CursorPtr test_config;
 
+/// For Windoze
+#ifndef M_PI
+#define M_PI 3.14159265358979323846
+#endif
+
 BOOST_AUTO_TEST_SUITE( Optimization )
 
 // -------------------------------------------------------------
