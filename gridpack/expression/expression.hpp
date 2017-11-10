@@ -10,7 +10,7 @@
 /**
  * @file   expression.hpp
  * @author William A. Perkins
- * @date   2017-03-22 10:41:02 d3g096
+ * @date   2017-11-10 10:18:37 d3g096
  * 
  * @brief  
  * 
@@ -196,8 +196,7 @@ class ConstantExpression
 private:
 
   /// Test for correct types
-  BOOST_STATIC_ASSERT(boost::is_same<T, double>::value ||
-                      boost::is_same<T, int>::value);
+  BOOST_STATIC_ASSERT((boost::is_same<T, double>::value || boost::is_same<T, int>::value));
 
 public:
 

@@ -10,7 +10,7 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created May  3, 2013 by William A. Perkins
-# Last Change: 2017-02-14 11:03:28 d3g096
+# Last Change: 2017-11-10 10:03:49 d3g096
 # -------------------------------------------------------------
 
 cmake_minimum_required (VERSION 2.8.8)
@@ -95,7 +95,7 @@ message(STATUS "MPI_CXX_LIBRARIES: ${MPI_CXX_LIBRARIES}")
 # MPI. How can I check that?
 # -------------------------------------------------------------
 message(STATUS "Checking Boost ...")
-set(Boost_USE_STATIC_LIBS ON)
+# set(Boost_USE_STATIC_LIBS ON)
 find_package(Boost 1.49 COMPONENTS mpi serialization random filesystem system REQUIRED)
 include_directories(AFTER ${Boost_INCLUDE_DIRS})
 
@@ -107,6 +107,7 @@ include_directories(AFTER ${Boost_INCLUDE_DIRS})
 # -------------------------------------------------------------
 message(STATUS "Checking PETSc ...")
 find_package (PETSc COMPONENTS CXX REQUIRED)
+message(STATUS "Using PETSc version ${PETSC_VERSION}")
 
 if (EXISTS "${PETSC_DIR}/${PETSC_ARCH}/conf/PETScConfig.cmake")
   include("${PETSC_DIR}/${PETSC_ARCH}/conf/PETScConfig.cmake")
@@ -301,7 +302,7 @@ endif()
 #  ****NOTE****
 #  For any subdirectory that contributes a LIBRARY to the
 #  GridPACK framework, modifications also need to be made to
-#  the src/lib/GridPACK/cmake.in file so that installs will
+#  the src/lib/GridPACK.cmake.in file so that installs will
 #  work correctly
 #
 # -------------------------------------------------------------
@@ -329,6 +330,7 @@ if (GA_FOUND)
   add_subdirectory(applications/state_estimation)
   add_subdirectory(applications/examples/hello_world)
   add_subdirectory(applications/examples/resistor_grid)
+  add_subdirectory(applications/examples/powerflow)
   add_subdirectory(applications/modules/powerflow)
   add_subdirectory(applications/modules/dynamic_simulation)
   add_subdirectory(applications/modules/dynamic_simulation_full_y)

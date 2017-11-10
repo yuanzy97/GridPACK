@@ -10,7 +10,7 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created May  6, 2013 by William A. Perkins
-# Last Change: 2016-11-11 11:25:03 d3g096
+# Last Change: 2017-11-10 10:22:13 d3g096
 # -------------------------------------------------------------
 
 add_library(gridpack_parallel 
@@ -52,6 +52,7 @@ install(FILES
   random.hpp
   index_hash.hpp
   global_store.hpp
+  global_vector.hpp
   DESTINATION include/gridpack/parallel
 )
 
@@ -168,5 +169,15 @@ target_link_libraries(store_test gridpack_parallel
   ${target_libraries})
 
 gridpack_add_run_test(store_test store_test "")
-endif (GA_FOUND)
 
+# -------------------------------------------------------------
+# TEST: vector_test
+# A simple program to test the global vector module
+# -------------------------------------------------------------
+add_executable(vector_test test/vector_test.cpp)
+target_link_libraries(vector_test gridpack_parallel 
+  ${GA_LIBRARIES} ${Boost_LIBRARIES} ${MPI_CXX_LIBRARIES})
+
+gridpack_add_run_test(vector_test vector_test "")
+
+endif (GA_FOUND)

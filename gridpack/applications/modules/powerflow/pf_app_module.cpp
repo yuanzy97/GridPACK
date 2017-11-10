@@ -15,9 +15,14 @@
  */
 // -------------------------------------------------------------
 
-#include "gridpack/include/gridpack.hpp"
 #include "pf_app_module.hpp"
 #include "pf_factory_module.hpp"
+#include "gridpack/mapper/full_map.hpp"
+#include "gridpack/mapper/bus_vector_map.hpp"
+#include "gridpack/parser/PTI23_parser.hpp"
+#include "gridpack/parser/PTI33_parser.hpp"
+#include "gridpack/parser/GOSS_parser.hpp"
+#include "gridpack/math/math.hpp"
 #include "pf_helper.hpp"
 
 #define USE_REAL_VALUES
@@ -164,6 +169,19 @@ void gridpack::powerflow::PFAppModule::initialize()
   p_network->initBusUpdate();
   timer->stop(t_updt);
   timer->stop(t_total);
+}
+
+/**
+ * Reinitialize calculation from data collections
+ */
+void gridpack::powerflow::PFAppModule::reload()
+{
+  gridpack::utility::CoarseTimer *timer =
+    gridpack::utility::CoarseTimer::instance();
+  int t_load = timer->createCategory("Powerflow: Factory Load");
+  timer->start(t_load);
+  p_factory->load();
+  timer->stop(t_load);
 }
 
 /**

@@ -5,7 +5,7 @@
  */
 // -------------------------------------------------------------
 /**
- * @file   ds_main.cpp
+ * @file   dsf_main.cpp
  * @author Shuangshuang Jin
  * @date   2016-07-14 14:23:30 d3g096
  *
@@ -16,6 +16,7 @@
 #include "mpi.h"
 #include <ga.h>
 #include <macdecls.h>
+#include "gridpack/parser/dictionary.hpp"
 #include "gridpack/math/math.hpp"
 #include "gridpack/applications/modules/powerflow/pf_app_module.hpp"
 #include "gridpack/applications/modules/dynamic_simulation_full_y/dsf_app_module.hpp"
@@ -142,9 +143,7 @@ main(int argc, char **argv)
     ds_app.readGenerators();
     //printf("ds_app.initialize:\n");
     ds_app.initialize();
-    ds_app.open("init_debug.values");
-    ds_app.write("debug_initial");
-    ds_app.close();
+    ds_app.setGeneratorWatch();
     //printf("gen ID:	mac_ang_s0	mac_spd_s0	pmech	pelect\n");
     //printf("Step	time:	bus_id	mac_ang_s1	mac_spd_s1\n");
     //printf("ds_app.solve:\n");
