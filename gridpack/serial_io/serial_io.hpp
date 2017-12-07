@@ -7,7 +7,7 @@
 /**
  * @file   serial_io.hpp
  * @author Bruce Palmer
- * @date   2017-12-07 10:04:28 d3g096
+ * @date   2017-12-07 10:19:58 d3g096
  * 
  * @brief  
  * 
@@ -753,7 +753,6 @@ class SerialBranchIO {
       if (p_network->getActiveBranch(i) &&
           p_network->getBranch(i)->serialWrite(&string[0],p_size,signal)) nwrites++;
     }
-    delete [] string;
 
     // Set up buffers to scatter strings to global buffer
     int *iptr;
