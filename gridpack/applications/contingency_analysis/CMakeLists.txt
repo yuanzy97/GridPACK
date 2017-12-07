@@ -10,24 +10,25 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created May  6, 2013 by William A. Perkins
-# Last Change: 2014-12-10 07:37:26 d3g096
+# Last Change: 2017-12-07 07:59:01 d3g096
 # -------------------------------------------------------------
 
 set(target_libraries
     gridpack_powerflow_module
+    gridpack_pfmatrix_components
+    gridpack_ymatrix_components
     gridpack_components
     gridpack_partition
-    gridpack_parallel
     gridpack_math
     gridpack_configuration
     gridpack_timer
-    gridpack_pfmatrix_components
-    gridpack_ymatrix_components
+    gridpack_parallel
     ${PARMETIS_LIBRARY} ${METIS_LIBRARY} 
     ${Boost_LIBRARIES}
     ${GA_LIBRARIES}
+    ${PETSC_LIBRARIES}
     ${MPI_CXX_LIBRARIES}
-    ${PETSC_LIBRARIES})
+    )
 
 include_directories(BEFORE ${CMAKE_CURRENT_SOURCE_DIR})
 if (GA_FOUND)
@@ -43,12 +44,18 @@ target_link_libraries(ca.x ${target_libraries})
 
 # Put some sample input in the binary directory so ca.x can run
 
+add_custom_command(
+  OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/input.xml"
+  COMMAND ${CMAKE_COMMAND}
+  -D INPUT:PATH="${CMAKE_CURRENT_SOURCE_DIR}/input.xml"
+  -D OUTPUT:PATH="${CMAKE_CURRENT_BINARY_DIR}/input.xml"
+  -D PKG:STRING="${GRIDPACK_MATSOLVER_PKG}"
+  -P "${PROJECT_SOURCE_DIR}/cmake-modules/set_lu_solver_pkg.cmake"
+  DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/input.xml"
+  )
+
 add_custom_target(ca.x.input
  
-  COMMAND ${CMAKE_COMMAND} -E copy 
-  ${CMAKE_CURRENT_SOURCE_DIR}/input.xml
-  ${CMAKE_CURRENT_BINARY_DIR}
-
   COMMAND ${CMAKE_COMMAND} -E copy 
   ${CMAKE_CURRENT_SOURCE_DIR}/IEEE14_ca.raw
   ${CMAKE_CURRENT_BINARY_DIR}
@@ -58,20 +65,14 @@ add_custom_target(ca.x.input
   ${CMAKE_CURRENT_BINARY_DIR}
 
   DEPENDS
-  ${CMAKE_CURRENT_SOURCE_DIR}/input.xml
+  ${CMAKE_CURRENT_BINARY_DIR}/input.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/IEEE14_ca.raw
   ${CMAKE_CURRENT_SOURCE_DIR}/contingencies.xml
 )
 add_dependencies(ca.x ca.x.input)
 
 # -------------------------------------------------------------
-# TEST: pf_network_test
-# -------------------------------------------------------------
-#add_executable(pf_network_test test/pf_network_test.cpp)
-#target_link_libraries(pf_network_test powerflow_app ${target_libraries})
-#gridpack_add_unit_test(pf_network_test pf_network_test)
-
-# -------------------------------------------------------------
 # run application as test
 # -------------------------------------------------------------
 gridpack_add_run_test("contingency_analysis" ca.x input.xml)
+

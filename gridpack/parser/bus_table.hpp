@@ -8,7 +8,7 @@
 /**
  * @file   bus_table.hpp
  * @author Bruce Palmer
- * @date   2016-12-20 09:25:03 d3g293
+ * @date   2017-12-07 10:02:38 d3g096
  * 
  * @brief  
  * This is a utility that is designed to parse an external file representing a
@@ -308,8 +308,7 @@ public:
     int nsize = p_local_idx.size();
     std::vector<double> v(nsize);
     std::vector<int> array(nsize);
-    int **subscript;
-    subscript = new int*[nsize];
+    std::vector<int*> subscript(nsize);
     int *ptr = &array[0];
     int i;
     for (i=0; i<nsize; i++) {
@@ -317,8 +316,7 @@ public:
       subscript[i] = ptr;
       ptr++;
     }
-    NGA_Gather(p_GA_data, &v[0], subscript, nsize);
-    delete [] subscript;
+    NGA_Gather(p_GA_data, &v[0], &subscript[0], nsize);
     p_comm.sync();
     for (i=0; i<nsize; i++) {
       values.push_back(v[i]);

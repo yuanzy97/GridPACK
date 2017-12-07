@@ -59,8 +59,10 @@ class BaseParser
       int i;
       // Exchange information on number of buses and branches on each
       // processor
-      std::vector<int> sbus(nprocs), sbranch(nprocs);
-      std::vector<int> nbus(nprocs), nbranch(nprocs);
+      std::vector<int> sbus(nprocs);
+      std::vector<int> sbranch(nprocs);
+      std::vector<int> nbus(nprocs);
+      std::vector<int> nbranch(nprocs);
       for (i=0; i<nprocs; i++) {
         sbus[i] = 0;
         sbranch[i] = 0;
@@ -72,7 +74,8 @@ class BaseParser
       ierr = MPI_Allreduce(&sbus[0],&nbus[0],nprocs,MPI_INT,MPI_SUM,comm);
       ierr = MPI_Allreduce(&sbranch[0],&nbranch[0],nprocs,MPI_INT,MPI_SUM,comm);
       // evaluate offsets for buses and branches
-      std::vector<int> offset_bus(nprocs), offset_branch(nprocs);
+      std::vector<int> offset_bus(nprocs);
+      std::vector<int> offset_branch(nprocs);
       offset_bus[0] = 0;
       offset_branch[0] = 0;
       for (i=1; i<nprocs; i++) {

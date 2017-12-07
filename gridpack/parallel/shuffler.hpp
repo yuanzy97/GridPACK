@@ -8,7 +8,7 @@
 /**
  * @file   shuffler.hpp
  * @author William A. Perkins
- * @date   2014-12-09 13:35:20 d3g096
+ * @date   2017-12-07 10:01:33 d3g096
  * 
  * @brief  A thing to redistribute a vector of things over several processors 
  * 
@@ -130,8 +130,8 @@ public:
       // Don't send messages of zero size. Exchange sizes with all processors
       // first
       //printf("p[%d] Got to 1\n",me);
-      std::vector<int> srcsizes(nprocs), tsizes(nprocs);
-      // int srcsizes[nprocs], tsizes[nprocs];
+      std::vector<int> srcsizes(nprocs);
+      std::vector<int> tsizes(nprocs);
       for (int i = 0; i<nprocs; i++) {
         if (src == me) {
           srcsizes[i] = tosend[i].size();
