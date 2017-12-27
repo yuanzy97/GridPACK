@@ -40,7 +40,7 @@ namespace bus_table {
 
 typedef struct {
   int order;
-  char tag[2];
+  char tag[3];
 } table_t;
 
 // -------------------------------------------------------------
@@ -79,6 +79,7 @@ public:
     int nval = 0;
     int nline = 0;
     gridpack::utility::StringUtils util;
+    p_headers.clear();
     if (me == 0) {
       // Cheesy hack to find out how many lines are in the file. Just open
       // the file and read all lines, then close it and open it again.
@@ -90,7 +91,7 @@ public:
       } else {
         std::string line;
         // Check to see if any lines are comments
-        if (std::getline(input,line)) {
+        if (!std::getline(input,line).eof()) {
           util.trim(line);
           bool found = true;
           while (line[0] == '#') {
@@ -99,7 +100,7 @@ public:
             line[0] = ' ';
             util.trim(line);
             p_headers.push_back(line);
-            found = std::getline(input,line);
+            found = !std::getline(input,line).eof();
           }
           if (found) {
             util.trim(line);
@@ -109,7 +110,7 @@ public:
             nval = split_line.size() - 2;
             if (nval > 0) {
               nline = 1;
-              while(std::getline(input,line)) {
+              while(!std::getline(input,line).eof()) {
                 nline++;
               }
             } else {
@@ -203,7 +204,7 @@ public:
         input.open(filename.c_str());
         std::vector<std::string> split_line;
         std::string line;
-        while(std::getline(input,line)) {
+        while(!std::getline(input,line).eof()) {
           while (line[0] == '#') {
             // Line is a comment. Store as a string for use elsewhere after
             // removing the comment character (#)
@@ -217,6 +218,7 @@ public:
           std::string tag = split_line[1];
           std::string new_tag = util.clean2Char(tag);
           strncpy(data.tag,new_tag.c_str(),2);
+          data.tag[2] = '\0';
           bus_id.push_back(atoi(split_line[0].c_str()));
           order.push_back(data);
           for (i=0; i<nval; i++) {
@@ -253,6 +255,7 @@ public:
       delete hash;
       p_local_idx.clear();
       p_tags.clear();
+      p_order.clear();
       for (i=0; i<bus_id.size(); i++) {
         p_local_idx.push_back(bus_id[i]);
         std::string tmp(order[i].tag);
